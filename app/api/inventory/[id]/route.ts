@@ -130,6 +130,68 @@ export async function PUT(
   }
 }
 
+// PATCH to update specific fields of an inventory item
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const id = params.id;
+    if (!id) {
+      return NextResponse.json(
+        { error: "Inventory ID is required" },
+        { status: 400 }
+      );
+    }
+
+    // Get the request body
+    const body = await request.json();
+
+    // Validate the data
+    const validatedData = inventoryUpdateSchema.parse(body);
+
+    // Create a Supabase client
+    const supabase = createServerComponentClient({ cookies });
+
+    // Add updated_at timestamp
+    const dataToUpdate = {
+      ...validatedData,
+      updated_at: new Date().toISOString(),
+    };
+
+    // Update the inventory item
+    const { data, error } = await supabase
+      .from("inventory")
+      .update(dataToUpdate)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error updating inventory item:", error);
+      if (error.code === "PGRST116") {
+        return NextResponse.json(
+          { error: "Inventory item not found" },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ data });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: error.errors }, { status: 400 });
+    }
+
+    console.error("Error in inventory PATCH route:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
 // DELETE an inventory item
 export async function DELETE(
   request: NextRequest,

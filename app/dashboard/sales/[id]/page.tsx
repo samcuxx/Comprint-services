@@ -17,6 +17,8 @@ import {
   ShoppingCart,
   Package,
   Truck,
+  CircleDollarSign,
+  Percent,
 } from "lucide-react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
@@ -32,6 +34,7 @@ export default function SaleDetailsPage() {
   // Get current user to check role
   const { data: currentUser } = useCurrentUser();
   const isAdmin = currentUser?.role === "admin";
+  const isSales = currentUser?.role === "sales";
 
   const { data: sale, isLoading, isError, error } = useSale(saleId);
 
@@ -351,6 +354,55 @@ export default function SaleDetailsPage() {
               <p className="text-muted-foreground whitespace-pre-line">
                 {sale.notes}
               </p>
+            </div>
+          )}
+
+          {/* Commission Info */}
+          {(isAdmin ||
+            (isSales && sale.sales_person.id === currentUser?.id)) && (
+            <div className="mt-4 pt-4 border-t">
+              <h3 className="text-lg font-medium mb-2">
+                Commission Information
+              </h3>
+              <div className="grid gap-2">
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center text-muted-foreground">
+                    <CircleDollarSign className="h-4 w-4 mr-2" />
+                    Total Commission
+                  </div>
+                  <div className="font-medium">
+                    {formatCurrency(
+                      (sale.items || []).reduce(
+                        (sum, item) =>
+                          sum +
+                          item.quantity *
+                            item.unit_price *
+                            (item.commission_rate / 100),
+                        0
+                      )
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center text-muted-foreground">
+                    <Percent className="h-4 w-4 mr-2" />
+                    Commission Rates
+                  </div>
+                  <div>
+                    {[
+                      ...new Set(
+                        (sale.items || []).map((item) => item.commission_rate)
+                      ),
+                    ]
+                      .sort((a, b) => a - b)
+                      .map((rate) => (
+                        <Badge key={rate} variant="outline" className="ml-1">
+                          {rate}%
+                        </Badge>
+                      ))}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>

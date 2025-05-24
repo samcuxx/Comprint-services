@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useUser, useUpdateUser } from "@/hooks/use-users";
+import { CommissionSummary } from "@/components/commissions/commission-summary";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -223,6 +224,12 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
       </div>
+
+      {userData.role === "sales" && (
+        <div className="mt-8">
+          <CommissionSummary salesPersonId={userData.id} />
+        </div>
+      )}
     </div>
   );
 }

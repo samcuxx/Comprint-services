@@ -14,6 +14,7 @@ import {
   PackageOpen,
   User,
   ShoppingCart,
+  CircleDollarSign,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { UserRole } from "@/lib/database.types";
@@ -63,6 +64,12 @@ const adminNavItems: NavItem[] = [
     description: "Manage sales and invoices",
   },
   {
+    title: "Commissions",
+    href: "/dashboard/commissions",
+    icon: CircleDollarSign,
+    description: "Track sales commissions",
+  },
+  {
     title: "Customers",
     href: "/dashboard/customers",
     icon: User,
@@ -106,6 +113,12 @@ const salesNavItems: NavItem[] = [
     href: "/dashboard/sales",
     icon: ShoppingCart,
     description: "Create and manage sales",
+  },
+  {
+    title: "Commissions",
+    href: "/dashboard/commissions",
+    icon: CircleDollarSign,
+    description: "View your commissions",
   },
   {
     title: "Customers",
