@@ -6,11 +6,9 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   Users,
-  ArrowLeftRight,
-  BarChart3,
-  Settings,
   Wrench,
   ShoppingCart,
+  UserCircle,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { UserRole } from "@/lib/types";
@@ -27,19 +25,9 @@ const adminNavItems = [
     icon: Users,
   },
   {
-    title: "Transactions",
-    href: "/dashboard/transactions",
-    icon: ArrowLeftRight,
-  },
-  {
-    title: "Reports",
-    href: "/dashboard/reports",
-    icon: BarChart3,
-  },
-  {
-    title: "Settings",
-    href: "/dashboard/settings",
-    icon: Settings,
+    title: "Profile",
+    href: "/dashboard/profile",
+    icon: UserCircle,
   },
 ];
 
@@ -55,14 +43,9 @@ const salesNavItems = [
     icon: ShoppingCart,
   },
   {
-    title: "Transactions",
-    href: "/dashboard/transactions",
-    icon: ArrowLeftRight,
-  },
-  {
     title: "Profile",
     href: "/dashboard/profile",
-    icon: Settings,
+    icon: UserCircle,
   },
 ];
 
@@ -78,14 +61,9 @@ const technicianNavItems = [
     icon: Wrench,
   },
   {
-    title: "Transactions",
-    href: "/dashboard/transactions",
-    icon: ArrowLeftRight,
-  },
-  {
     title: "Profile",
     href: "/dashboard/profile",
-    icon: Settings,
+    icon: UserCircle,
   },
 ];
 
@@ -106,7 +84,7 @@ export function Sidebar() {
   return (
     <div className="flex h-full w-64 flex-col border-r bg-white">
       <div className="flex h-14 items-center border-b px-4">
-        <h1 className="text-lg font-semibold">Employee Management</h1>
+        <h1 className="text-lg font-semibold">Comprint Services</h1>
       </div>
       <nav className="flex-1 space-y-1 p-4">
         {navItems.map((item) => (

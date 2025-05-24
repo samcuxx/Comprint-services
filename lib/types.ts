@@ -2,14 +2,15 @@ import { z } from "zod";
 
 export const UserRole = {
   ADMIN: "admin",
-  EMPLOYEE: "employee",
+  SALES: "sales",
+  TECHNICIAN: "technician",
 } as const;
 
-export type UserRole = "admin" | "employee";
+export type UserRole = "admin" | "sales" | "technician";
 
 export const TransactionType = {
   COMMISSION: "commission",
-  TRANSFER: "transfer",
+  SERVICE: "service",
 } as const;
 
 export type TransactionType =
@@ -20,7 +21,6 @@ export interface User {
   email: string;
   full_name: string;
   role: UserRole;
-  branch_id: string;
   staff_id: string;
   address?: string;
   contact_number?: string;
@@ -49,7 +49,6 @@ export interface Transaction {
   amount: number;
   type: TransactionType;
   user_id: string;
-  branch_id: string;
-  transfer_type_id?: string;
+  description?: string;
   created_at: string;
 }
