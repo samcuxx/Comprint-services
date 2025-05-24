@@ -9,61 +9,84 @@ import {
   Wrench,
   ShoppingCart,
   UserCircle,
+  Briefcase,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { UserRole } from "@/lib/types";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-const adminNavItems = [
+interface NavItem {
+  title: string;
+  href: string;
+  icon: React.ElementType;
+  description?: string;
+}
+
+const adminNavItems: NavItem[] = [
   {
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+    description: "Overview of system metrics",
   },
   {
     title: "Employees",
     href: "/dashboard/employees",
     icon: Users,
+    description: "Manage employee accounts",
   },
   {
     title: "Profile",
     href: "/dashboard/profile",
     icon: UserCircle,
+    description: "Update your profile",
   },
 ];
 
-const salesNavItems = [
+const salesNavItems: NavItem[] = [
   {
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+    description: "Your performance metrics",
   },
   {
     title: "Sales",
     href: "/dashboard/sales",
     icon: ShoppingCart,
+    description: "Record and track sales",
   },
   {
     title: "Profile",
     href: "/dashboard/profile",
     icon: UserCircle,
+    description: "Update your profile",
   },
 ];
 
-const technicianNavItems = [
+const technicianNavItems: NavItem[] = [
   {
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+    description: "Your service metrics",
   },
   {
     title: "Services",
     href: "/dashboard/services",
     icon: Wrench,
+    description: "Manage service requests",
   },
   {
     title: "Profile",
     href: "/dashboard/profile",
     icon: UserCircle,
+    description: "Update your profile",
   },
 ];
 
@@ -71,38 +94,70 @@ export function Sidebar() {
   const pathname = usePathname();
   const { userRole } = useAuth();
 
-  console.log("Sidebar - Current userRole:", userRole);
+  // Determine navigation items based on user role
+  const getNavItems = (role: UserRole | null): NavItem[] => {
+    if (!role) return adminNavItems;
 
-  let navItems = adminNavItems;
+    switch (role) {
+      case "sales":
+        return salesNavItems;
+      case "technician":
+        return technicianNavItems;
+      case "admin":
+      default:
+        return adminNavItems;
+    }
+  };
 
-  if (userRole === "sales") {
-    navItems = salesNavItems;
-  } else if (userRole === "technician") {
-    navItems = technicianNavItems;
-  }
+  const navItems = getNavItems(userRole);
 
   return (
-    <div className="flex h-full w-64 flex-col border-r bg-white">
-      <div className="flex h-14 items-center border-b px-4">
-        <h1 className="text-lg font-semibold">Comprint Services</h1>
+    <aside className="flex h-full w-64 flex-col border-r bg-background shadow-sm">
+      <div className="flex h-16 items-center border-b px-6">
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <Briefcase className="h-5 w-5 text-primary" />
+          <h1 className="text-lg font-semibold">Comprint Services</h1>
+        </Link>
       </div>
       <nav className="flex-1 space-y-1 p-4">
-        {navItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex items-center space-x-2 rounded-lg px-3 py-2 text-sm font-medium",
-              pathname === item.href
-                ? "bg-gray-100 text-gray-900"
-                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            )}
-          >
-            <item.icon className="h-5 w-5" />
-            <span>{item.title}</span>
-          </Link>
-        ))}
+        <TooltipProvider delayDuration={300}>
+          {navItems.map((item) => (
+            <Tooltip key={item.href}>
+              <TooltipTrigger asChild>
+                <Link
+                  href={item.href}
+                  className={cn(
+                    "flex items-center rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
+                    pathname === item.href
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground/70 hover:bg-muted hover:text-foreground"
+                  )}
+                >
+                  <item.icon
+                    className={cn(
+                      "mr-2 h-5 w-5",
+                      pathname === item.href
+                        ? "text-primary"
+                        : "text-muted-foreground"
+                    )}
+                  />
+                  <span>{item.title}</span>
+                </Link>
+              </TooltipTrigger>
+              {item.description && (
+                <TooltipContent side="right">
+                  <p>{item.description}</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          ))}
+        </TooltipProvider>
       </nav>
-    </div>
+      <div className="border-t p-4">
+        <div className="text-xs text-muted-foreground">
+          Comprint Services &copy; {new Date().getFullYear()}
+        </div>
+      </div>
+    </aside>
   );
 }

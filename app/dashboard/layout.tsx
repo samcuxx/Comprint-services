@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Sidebar } from "@/components/dashboard/sidebar";
@@ -22,7 +22,11 @@ export default function DashboardLayout({
   }, [user, session, loading, router]);
 
   if (loading) {
-    return <Loading />;
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <Loading />
+      </div>
+    );
   }
 
   if (!user || !session) {
@@ -30,11 +34,21 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-900">
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto p-4">{children}</main>
+        <main className="flex-1 overflow-y-auto">
+          <Suspense
+            fallback={
+              <div className="flex h-[70vh] items-center justify-center">
+                <Loading />
+              </div>
+            }
+          >
+            <div className="container mx-auto px-6 py-6">{children}</div>
+          </Suspense>
+        </main>
       </div>
     </div>
   );

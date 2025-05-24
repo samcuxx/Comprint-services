@@ -1,10 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { UserRole } from "@/lib/types";
 import {
   Users,
   ShoppingCart,
@@ -12,135 +9,11 @@ import {
   ClipboardList,
   Loader2,
 } from "lucide-react";
-
-interface DashboardStats {
-  totalEmployees: number;
-  totalSales: number;
-  totalServices: number;
-  pendingTasks: number;
-  salesData?: {
-    dailySales: number;
-    monthlyGoal: number;
-    lowStockItems: number;
-    newCustomers: number;
-  };
-  technicianData?: {
-    activeServiceRequests: number;
-    completedToday: number;
-    pendingParts: number;
-    customerFeedback: number;
-  };
-}
+import { useDashboardStats } from "@/hooks/use-dashboard-stats";
 
 export default function DashboardPage() {
   const { user, userRole } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
-  const [stats, setStats] = useState<DashboardStats>({
-    totalEmployees: 0,
-    totalSales: 0,
-    totalServices: 0,
-    pendingTasks: 0,
-  });
-
-  useEffect(() => {
-    async function fetchDashboardStats() {
-      try {
-        let dashboardStats: DashboardStats = {
-          totalEmployees: 0,
-          totalSales: 0,
-          totalServices: 0,
-          pendingTasks: 0,
-        };
-
-        // Fetch employees count (admin only)
-        if (userRole === "admin") {
-          const { count: employeesCount } = await supabase
-            .from("users")
-            .select("*", { count: "exact", head: true });
-
-          dashboardStats.totalEmployees = employeesCount || 0;
-        }
-
-        // Fetch sales transactions count
-        const { count: salesCount } = await supabase
-          .from("transactions")
-          .select("*", { count: "exact", head: true })
-          .eq("type", "commission");
-
-        dashboardStats.totalSales = salesCount || 0;
-
-        // Fetch service transactions count
-        const { count: servicesCount } = await supabase
-          .from("transactions")
-          .select("*", { count: "exact", head: true })
-          .eq("type", "service");
-
-        dashboardStats.totalServices = servicesCount || 0;
-
-        // Mock pending tasks (this would be from a tasks table in a real app)
-        dashboardStats.pendingTasks = Math.floor(Math.random() * 10) + 1;
-
-        // For sales role, get specific stats
-        if (userRole === "sales") {
-          // Get today's date in ISO format
-          const today = new Date().toISOString().split("T")[0];
-
-          // Count user's sales for today
-          const { count: dailySales } = await supabase
-            .from("transactions")
-            .select("*", { count: "exact", head: true })
-            .eq("type", "commission")
-            .eq("user_id", user?.id)
-            .gte("created_at", today);
-
-          dashboardStats.salesData = {
-            dailySales: dailySales || 0,
-            monthlyGoal: 85, // This would come from a goals table in a real app
-            lowStockItems: 6, // This would come from inventory in a real app
-            newCustomers: 12, // This would come from customers in a real app
-          };
-        }
-
-        // For technician role, get specific stats
-        if (userRole === "technician") {
-          // Count user's active service requests
-          const { count: activeRequests } = await supabase
-            .from("transactions")
-            .select("*", { count: "exact", head: true })
-            .eq("type", "service")
-            .eq("user_id", user?.id);
-
-          // Get today's date in ISO format
-          const today = new Date().toISOString().split("T")[0];
-
-          // Count completed services today
-          const { count: completedToday } = await supabase
-            .from("transactions")
-            .select("*", { count: "exact", head: true })
-            .eq("type", "service")
-            .eq("user_id", user?.id)
-            .gte("created_at", today);
-
-          dashboardStats.technicianData = {
-            activeServiceRequests: activeRequests || 0,
-            completedToday: completedToday || 0,
-            pendingParts: 4, // This would come from parts requests in a real app
-            customerFeedback: 4.8, // This would come from feedback in a real app
-          };
-        }
-
-        setStats(dashboardStats);
-      } catch (error) {
-        console.error("Error fetching dashboard stats:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    if (user) {
-      fetchDashboardStats();
-    }
-  }, [user, userRole]);
+  const { data: stats, isLoading } = useDashboardStats(user?.id, userRole);
 
   // Show different dashboard info based on role
   const renderRoleSpecificCards = () => {
@@ -148,6 +21,14 @@ export default function DashboardPage() {
       return (
         <div className="col-span-4 flex h-40 items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+        </div>
+      );
+    }
+
+    if (!stats) {
+      return (
+        <div className="col-span-4 text-center text-gray-500">
+          No dashboard data available
         </div>
       );
     }
@@ -308,108 +189,37 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {stats.technicianData.customerFeedback}/5
+                {stats.technicianData.customerFeedback}
               </div>
+              <p className="text-xs text-muted-foreground">Average Rating</p>
             </CardContent>
           </Card>
         </>
       );
-    } else {
-      // Fallback for unknown role
-      return (
-        <div className="col-span-4 text-center">
-          <p>Welcome! Please contact your administrator for access.</p>
-        </div>
-      );
     }
+
+    return null;
   };
 
-  return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-      <h2 className="text-lg font-medium">
-        Welcome back, {user?.user_metadata?.full_name || "User"}
-      </h2>
+  if (!user) {
+    return null;
+  }
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-3xl font-bold tracking-tight">
+          Welcome{" "}
+          {userRole === "admin"
+            ? "Administrator"
+            : userRole === "sales"
+            ? "Sales Associate"
+            : "Technician"}
+        </h2>
+      </div>
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
         {renderRoleSpecificCards()}
       </div>
-
-      {!isLoading && (
-        <div className="rounded-lg border bg-card p-6">
-          <h3 className="mb-4 text-lg font-medium">Quick Actions</h3>
-          <div className="grid gap-4 md:grid-cols-3">
-            {userRole === "admin" && (
-              <>
-                <div className="rounded-md bg-primary/10 p-4">
-                  <h4 className="font-medium">Add New Employee</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Create a new employee account
-                  </p>
-                </div>
-                <div className="rounded-md bg-primary/10 p-4">
-                  <h4 className="font-medium">Generate Reports</h4>
-                  <p className="text-sm text-muted-foreground">
-                    View sales and service reports
-                  </p>
-                </div>
-                <div className="rounded-md bg-primary/10 p-4">
-                  <h4 className="font-medium">Inventory Status</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Check stock levels and reorder
-                  </p>
-                </div>
-              </>
-            )}
-
-            {userRole === "sales" && (
-              <>
-                <div className="rounded-md bg-primary/10 p-4">
-                  <h4 className="font-medium">New Sale</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Process a new sales transaction
-                  </p>
-                </div>
-                <div className="rounded-md bg-primary/10 p-4">
-                  <h4 className="font-medium">Check Inventory</h4>
-                  <p className="text-sm text-muted-foreground">
-                    View available products
-                  </p>
-                </div>
-                <div className="rounded-md bg-primary/10 p-4">
-                  <h4 className="font-medium">Customer Lookup</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Find customer information
-                  </p>
-                </div>
-              </>
-            )}
-
-            {userRole === "technician" && (
-              <>
-                <div className="rounded-md bg-primary/10 p-4">
-                  <h4 className="font-medium">Update Service Status</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Mark services as in progress or complete
-                  </p>
-                </div>
-                <div className="rounded-md bg-primary/10 p-4">
-                  <h4 className="font-medium">Request Parts</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Order parts needed for service
-                  </p>
-                </div>
-                <div className="rounded-md bg-primary/10 p-4">
-                  <h4 className="font-medium">Service History</h4>
-                  <p className="text-sm text-muted-foreground">
-                    View past service records
-                  </p>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

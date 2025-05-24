@@ -12,9 +12,13 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  refreshUserData: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Cache user role to avoid unnecessary database queries
+const userRoleCache = new Map<string, UserRole>();
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -25,7 +29,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchUserRole = async (userId: string) => {
     try {
-      console.log("Fetching role for user:", userId);
+      // Check cache first
+      if (userRoleCache.has(userId)) {
+        return userRoleCache.get(userId);
+      }
+
       const { data, error } = await supabase
         .from("users")
         .select("role")
@@ -33,14 +41,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single();
 
       if (error) {
-        console.error("Error fetching user role:", error);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error fetching user role:", error);
+        }
         return null;
       }
 
-      console.log("User role from database:", data?.role);
-      return data?.role as UserRole;
+      const role = data?.role as UserRole;
+
+      // Cache the result
+      if (role) {
+        userRoleCache.set(userId, role);
+      }
+
+      return role;
     } catch (error) {
-      console.error("Error in fetchUserRole:", error);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Error in fetchUserRole:", error);
+      }
       return null;
     }
   };
@@ -52,13 +70,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       if (currentUser) {
         const role = await fetchUserRole(currentUser.id);
-        console.log("Setting user role to:", role);
         setUserRole(role);
       }
       setUser(currentUser);
       setSession(currentSession);
     } catch (error) {
-      console.error("Error in updateUserState:", error);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Error in updateUserState:", error);
+      }
+    }
+  };
+
+  // Function to refresh user data
+  const refreshUserData = async () => {
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session?.user) {
+        // Clear cache for this user to get fresh data
+        userRoleCache.delete(session.user.id);
+        await updateUserState(session.user, session);
+      }
+    } catch (error) {
+      if (process.env.NODE_ENV === "development") {
+        console.error("Error refreshing user data:", error);
+      }
     }
   };
 
@@ -72,7 +109,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           await updateUserState(session.user, session);
         }
       } catch (error) {
-        console.error("Error in initializeAuth:", error);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error in initializeAuth:", error);
+        }
       } finally {
         setLoading(false);
       }
@@ -83,8 +122,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session?.user?.id);
-
       if (event === "SIGNED_IN" && session) {
         await updateUserState(session.user, session);
         router.push("/dashboard");
@@ -93,6 +130,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(null);
         setUserRole(null);
         router.push("/auth/login");
+      } else if (event === "USER_UPDATED" && session) {
+        // Handle user profile updates
+        await updateUserState(session.user, session);
+      } else if (event === "TOKEN_REFRESHED" && session) {
+        // Update session only
+        setSession(session);
       }
     });
 
@@ -101,6 +144,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
+      setLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -112,27 +156,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await updateUserState(data.user, data.session);
       }
     } catch (error) {
-      console.error("Error in signIn:", error);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const signOut = async () => {
     try {
+      setLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+
+      // Clear cache on sign out
+      userRoleCache.clear();
+
       setUser(null);
       setSession(null);
       setUserRole(null);
     } catch (error) {
-      console.error("Error in signOut:", error);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Error in signOut:", error);
+      }
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <AuthContext.Provider
-      value={{ user, session, userRole, loading, signIn, signOut }}
+      value={{
+        user,
+        session,
+        userRole,
+        loading,
+        signIn,
+        signOut,
+        refreshUserData,
+      }}
     >
       {children}
     </AuthContext.Provider>

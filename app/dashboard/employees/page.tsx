@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Loading } from "@/components/ui/loading";
 import { Database } from "@/lib/database.types";
 import { AddEmployeeModal } from "@/components/employees/add-employee-modal";
 import { EditEmployeeModal } from "@/components/employees/edit-employee-modal";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Power, PowerOff } from "lucide-react";
+import { Pencil, Trash2, Power, PowerOff, UserX, Search } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,12 +18,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { useUsers, useDeleteUser } from "@/hooks/use-users";
 
 type Employee = Database["public"]["Tables"]["users"]["Row"];
 
 export default function EmployeesPage() {
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
     null
   );
@@ -32,177 +32,226 @@ export default function EmployeesPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
 
-  const fetchEmployees = async () => {
+  // Use the React Query hook for employees
+  const {
+    data: employees = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useUsers();
+
+  // Mutation hook for deleting employees
+  const deleteUserMutation = useDeleteUser();
+
+  // Filter employees based on search query
+  const filteredEmployees =
+    searchQuery.trim() === ""
+      ? employees
+      : employees.filter(
+          (employee) =>
+            employee.full_name
+              ?.toLowerCase()
+              .includes(searchQuery.toLowerCase()) ||
+            employee.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            employee.staff_id
+              ?.toLowerCase()
+              .includes(searchQuery.toLowerCase()) ||
+            employee.role?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+
+  const handleToggleStatus = async (employeeId: string) => {
     try {
-      console.log("Fetching employees...");
-      const { data, error } = await supabase
-        .from("users")
-        .select("*")
-        .order("created_at", { ascending: false });
+      // Find the employee to get current status
+      const employee = employees.find((emp) => emp.id === employeeId);
+      if (!employee) return;
 
-      if (error) {
-        console.error("Supabase error:", error);
-        throw error;
-      }
-
-      console.log("Fetched employees:", data);
-      setEmployees(data || []);
-    } catch (error) {
-      console.error("Error fetching employees:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to fetch employees",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchEmployees();
-  }, []);
-
-  const handleDelete = async (employeeId: string) => {
-    try {
-      const response = await fetch(`/api/users/${employeeId}`, {
-        method: "DELETE",
+      // Use fetch API for this specific endpoint
+      const response = await fetch(`/api/users/${employeeId}/toggle-status`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          is_active: !employee.is_active,
+        }),
       });
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error);
+        throw new Error(data.error || "Failed to update employee status");
       }
+
+      toast({
+        title: "Status Updated",
+        description: `Employee is now ${
+          !employee.is_active ? "active" : "inactive"
+        }`,
+      });
+
+      // Refresh data after success
+      refetch();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Update Failed",
+        description: error.message || "Failed to update employee status",
+      });
+    }
+  };
+
+  const handleDelete = async (employeeId: string) => {
+    try {
+      await deleteUserMutation.mutateAsync(employeeId);
 
       toast({
         title: "Success",
         description: "Employee deleted successfully",
       });
 
-      fetchEmployees();
+      setIsDeleteDialogOpen(false);
+      setSelectedEmployee(null);
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Error",
+        title: "Deletion Failed",
         description: error.message || "Failed to delete employee",
-      });
-    }
-    setIsDeleteDialogOpen(false);
-  };
-
-  const handleToggleStatus = async (employeeId: string) => {
-    try {
-      const response = await fetch(`/api/users/${employeeId}/toggle-status`, {
-        method: "POST",
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error);
-      }
-
-      toast({
-        title: "Success",
-        description: "Employee status updated successfully",
-      });
-
-      fetchEmployees();
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to update employee status",
       });
     }
   };
 
   if (isLoading) {
-    return <Loading />;
+    return (
+      <div className="flex h-[70vh] items-center justify-center">
+        <Loading />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex h-[70vh] flex-col items-center justify-center space-y-4">
+        <UserX className="h-12 w-12 text-red-500" />
+        <h2 className="text-xl font-semibold">Failed to load employees</h2>
+        <p className="text-muted-foreground">
+          {error instanceof Error
+            ? error.message
+            : "An unexpected error occurred"}
+        </p>
+        <Button onClick={() => refetch()}>Try Again</Button>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Employees</h1>
-        <AddEmployeeModal onEmployeeAdded={fetchEmployees} />
+        <AddEmployeeModal onEmployeeAdded={() => refetch()} />
       </div>
-      <div className="rounded-md border">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b bg-muted/50">
-              <th className="p-4 text-left font-medium">Name</th>
-              <th className="p-4 text-left font-medium">Email</th>
-              <th className="p-4 text-left font-medium">Staff ID</th>
-              <th className="p-4 text-left font-medium">Role</th>
-              <th className="p-4 text-left font-medium">Status</th>
-              <th className="p-4 text-left font-medium">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {employees.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="p-4 text-center text-gray-500">
-                  No employees found
-                </td>
+
+      <div className="relative mb-4">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Search employees by name, email, ID or role..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+
+      <div className="rounded-md border shadow">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b bg-muted/50">
+                <th className="p-4 text-left font-medium">Name</th>
+                <th className="p-4 text-left font-medium">Email</th>
+                <th className="p-4 text-left font-medium">Staff ID</th>
+                <th className="p-4 text-left font-medium">Role</th>
+                <th className="p-4 text-left font-medium">Status</th>
+                <th className="p-4 text-left font-medium">Actions</th>
               </tr>
-            ) : (
-              employees.map((employee) => (
-                <tr key={employee.id} className="border-b">
-                  <td className="p-4">{employee.full_name}</td>
-                  <td className="p-4">{employee.email}</td>
-                  <td className="p-4">{employee.staff_id}</td>
-                  <td className="p-4">{employee.role}</td>
-                  <td className="p-4">
-                    <span
-                      className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                        employee.is_active
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {employee.is_active ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedEmployee(employee);
-                          setIsEditModalOpen(true);
-                        }}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleToggleStatus(employee.id)}
-                      >
-                        {employee.is_active ? (
-                          <PowerOff className="h-4 w-4 text-red-500" />
-                        ) : (
-                          <Power className="h-4 w-4 text-green-500" />
-                        )}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedEmployee(employee);
-                          setIsDeleteDialogOpen(true);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
-                    </div>
+            </thead>
+            <tbody>
+              {filteredEmployees.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="p-8 text-center text-muted-foreground"
+                  >
+                    {searchQuery.trim() !== ""
+                      ? "No employees match your search criteria"
+                      : "No employees found"}
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                filteredEmployees.map((employee) => (
+                  <tr
+                    key={employee.id}
+                    className="border-b hover:bg-muted/30 transition-colors"
+                  >
+                    <td className="p-4 font-medium">{employee.full_name}</td>
+                    <td className="p-4">{employee.email}</td>
+                    <td className="p-4">{employee.staff_id}</td>
+                    <td className="p-4 capitalize">{employee.role}</td>
+                    <td className="p-4">
+                      <span
+                        className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                          employee.is_active
+                            ? "bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400"
+                            : "bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400"
+                        }`}
+                      >
+                        {employee.is_active ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedEmployee(employee);
+                            setIsEditModalOpen(true);
+                          }}
+                          aria-label={`Edit ${employee.full_name}`}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleToggleStatus(employee.id)}
+                          aria-label={`${
+                            employee.is_active ? "Deactivate" : "Activate"
+                          } ${employee.full_name}`}
+                        >
+                          {employee.is_active ? (
+                            <PowerOff className="h-4 w-4 text-red-500" />
+                          ) : (
+                            <Power className="h-4 w-4 text-green-500" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedEmployee(employee);
+                            setIsDeleteDialogOpen(true);
+                          }}
+                          aria-label={`Delete ${employee.full_name}`}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {selectedEmployee && (
@@ -213,7 +262,7 @@ export default function EmployeesPage() {
             setIsEditModalOpen(false);
             setSelectedEmployee(null);
           }}
-          onEmployeeUpdated={fetchEmployees}
+          onEmployeeUpdated={() => refetch()}
         />
       )}
 
@@ -223,7 +272,7 @@ export default function EmployeesPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the
               employee account and remove their data from the system.
@@ -235,9 +284,10 @@ export default function EmployeesPage() {
               onClick={() =>
                 selectedEmployee && handleDelete(selectedEmployee.id)
               }
-              className="bg-red-500 hover:bg-red-600"
+              className="bg-red-500 hover:bg-red-600 focus:ring-red-500"
+              disabled={deleteUserMutation.isPending}
             >
-              Delete
+              {deleteUserMutation.isPending ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

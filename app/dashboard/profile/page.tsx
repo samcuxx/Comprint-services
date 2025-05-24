@@ -2,20 +2,31 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, User } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useUser, useUpdateUser } from "@/hooks/use-users";
 
 export default function ProfilePage() {
-  const { user, userRole } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Get user data from React Query
+  const {
+    data: userData,
+    isLoading,
+    error: userError,
+  } = useUser(user?.id || "");
+
+  // Use mutation hook for updating user
+  const updateUser = useUpdateUser();
+
+  // Initialize form state from user data or empty values
   const [profileData, setProfileData] = useState({
     full_name: "",
     email: "",
@@ -26,46 +37,20 @@ export default function ProfilePage() {
     profile_image_url: "",
   });
 
+  // Update form data when user data is loaded
   useEffect(() => {
-    async function fetchProfileData() {
-      if (!user) return;
-
-      try {
-        const { data, error } = await supabase
-          .from("users")
-          .select("*")
-          .eq("id", user.id)
-          .single();
-
-        if (error) {
-          throw error;
-        }
-
-        if (data) {
-          setProfileData({
-            full_name: data.full_name || "",
-            email: data.email || "",
-            staff_id: data.staff_id || "",
-            role: data.role || "",
-            contact_number: data.contact_number || "",
-            address: data.address || "",
-            profile_image_url: data.profile_image_url || "",
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to load profile data",
-        });
-      } finally {
-        setIsLoading(false);
-      }
+    if (userData) {
+      setProfileData({
+        full_name: userData.full_name || "",
+        email: userData.email || "",
+        staff_id: userData.staff_id || "",
+        role: userData.role || "",
+        contact_number: userData.contact_number || "",
+        address: userData.address || "",
+        profile_image_url: userData.profile_image_url || "",
+      });
     }
-
-    fetchProfileData();
-  }, [user, toast]);
+  }, [userData]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -81,18 +66,14 @@ export default function ProfilePage() {
 
     setIsSaving(true);
     try {
-      const { error } = await supabase
-        .from("users")
-        .update({
+      await updateUser.mutateAsync({
+        userId: user.id,
+        userData: {
           full_name: profileData.full_name,
           contact_number: profileData.contact_number,
           address: profileData.address,
-        })
-        .eq("id", user.id);
-
-      if (error) {
-        throw error;
-      }
+        },
+      });
 
       toast({
         title: "Success",
@@ -118,6 +99,15 @@ export default function ProfilePage() {
     );
   }
 
+  if (userError || !userData) {
+    return (
+      <div className="flex h-[80vh] flex-col items-center justify-center space-y-4">
+        <p className="text-red-500">Failed to load profile data</p>
+        <Button onClick={() => window.location.reload()}>Retry</Button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">My Profile</h1>
@@ -129,14 +119,14 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent className="flex flex-col items-center space-y-4">
             <Avatar className="h-24 w-24">
-              {profileData.profile_image_url ? (
+              {userData.profile_image_url ? (
                 <AvatarImage
-                  src={profileData.profile_image_url}
-                  alt={profileData.full_name}
+                  src={userData.profile_image_url}
+                  alt={userData.full_name}
                 />
               ) : (
                 <AvatarFallback className="text-lg">
-                  {profileData.full_name
+                  {userData.full_name
                     .split(" ")
                     .map((n) => n[0])
                     .join("")}
@@ -144,15 +134,13 @@ export default function ProfilePage() {
               )}
             </Avatar>
             <div className="text-center">
-              <h2 className="text-xl font-semibold">{profileData.full_name}</h2>
-              <p className="text-gray-500">{profileData.email}</p>
+              <h2 className="text-xl font-semibold">{userData.full_name}</h2>
+              <p className="text-gray-500">{userData.email}</p>
               <div className="mt-2 inline-flex rounded-full bg-blue-100 px-3 py-1 text-sm font-medium capitalize text-blue-800">
-                {profileData.role}
+                {userData.role}
               </div>
             </div>
-            <p className="text-sm font-medium">
-              Staff ID: {profileData.staff_id}
-            </p>
+            <p className="text-sm font-medium">Staff ID: {userData.staff_id}</p>
           </CardContent>
         </Card>
 
@@ -221,8 +209,15 @@ export default function ProfilePage() {
                   onChange={handleInputChange}
                 />
               </div>
-              <Button type="submit" disabled={isSaving}>
-                {isSaving ? "Saving..." : "Save Changes"}
+              <Button type="submit" disabled={isSaving || updateUser.isPending}>
+                {isSaving || updateUser.isPending ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Saving...
+                  </span>
+                ) : (
+                  "Save Changes"
+                )}
               </Button>
             </form>
           </CardContent>
