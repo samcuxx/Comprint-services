@@ -7,11 +7,12 @@ import {
   LayoutDashboard,
   Users,
   Wrench,
-  ShoppingCart,
   UserCircle,
   Briefcase,
   Package,
   FolderClosed,
+  PackageOpen,
+  User,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { UserRole } from "@/lib/database.types";
@@ -49,6 +50,18 @@ const adminNavItems: NavItem[] = [
     description: "Manage product inventory",
   },
   {
+    title: "Inventory",
+    href: "/dashboard/inventory",
+    icon: PackageOpen,
+    description: "Manage stock levels",
+  },
+  {
+    title: "Customers",
+    href: "/dashboard/customers",
+    icon: User,
+    description: "Manage customer database",
+  },
+  {
     title: "Categories",
     href: "/dashboard/product-categories",
     icon: FolderClosed,
@@ -74,6 +87,18 @@ const salesNavItems: NavItem[] = [
     href: "/dashboard/products",
     icon: Package,
     description: "View product inventory",
+  },
+  {
+    title: "Inventory",
+    href: "/dashboard/inventory",
+    icon: PackageOpen,
+    description: "View stock levels",
+  },
+  {
+    title: "Customers",
+    href: "/dashboard/customers",
+    icon: User,
+    description: "Manage customers",
   },
   {
     title: "Profile",
