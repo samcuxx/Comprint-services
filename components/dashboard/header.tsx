@@ -46,10 +46,16 @@ export function Header() {
   const handleSignOut = async () => {
     try {
       await signOut();
-      router.push("/auth/login");
+      // The auth state change will handle navigation, but we'll add a fallback
+      setTimeout(() => {
+        router.push("/auth/login");
+      }, 500);
     } catch (error) {
+      // If there was an error, we still want to redirect to login
+      router.push("/auth/login");
+
       if (process.env.NODE_ENV === "development") {
-        console.error("Error signing out:", error);
+        console.error("Error handling signOut:", error);
       }
     }
   };

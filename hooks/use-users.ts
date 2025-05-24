@@ -2,49 +2,57 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { User } from "@/lib/types";
+import { Database } from "@/lib/database.types";
 
 const QUERY_KEY = "users";
 
+type User = Database["public"]["Tables"]["users"]["Row"];
+
 // Get all users
 export function useUsers() {
-  return useQuery({
-    queryKey: [QUERY_KEY],
+  return useQuery<User[], Error>({
+    queryKey: ["users"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("users")
         .select("*")
-        .order("full_name", { ascending: true });
+        .order("full_name");
 
       if (error) {
-        throw error;
+        throw new Error(error.message);
       }
 
-      return data as User[];
+      return data || [];
     },
   });
 }
 
 // Get a single user by ID
 export function useUser(userId: string) {
-  return useQuery({
-    queryKey: [QUERY_KEY, userId],
+  return useQuery<User, Error>({
+    queryKey: ["currentUser"],
     queryFn: async () => {
-      if (!userId) return null;
+      // Get the current user's session
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession();
 
+      if (sessionError || !sessionData.session) {
+        throw new Error("Not authenticated");
+      }
+
+      // Get the user data from the users table
       const { data, error } = await supabase
         .from("users")
         .select("*")
-        .eq("id", userId)
+        .eq("id", sessionData.session.user.id)
         .single();
 
       if (error) {
-        throw error;
+        throw new Error(error.message);
       }
 
-      return data as User;
+      return data;
     },
-    enabled: !!userId, // Only run query if userId exists
   });
 }
 
@@ -114,10 +122,10 @@ export function useDeleteUser() {
 
   return useMutation({
     mutationFn: async (userId: string) => {
-      const { error } = await supabase.from("users").delete().eq("id", userId);
+      const { error } = await supabase.auth.admin.deleteUser(userId);
 
       if (error) {
-        throw error;
+        throw new Error(error.message);
       }
 
       return userId;

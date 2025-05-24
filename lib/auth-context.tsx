@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       if (currentUser) {
         const role = await fetchUserRole(currentUser.id);
-        setUserRole(role);
+        setUserRole(role || null);
       }
       setUser(currentUser);
       setSession(currentSession);
@@ -165,20 +165,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
 
-      // Clear cache on sign out
-      userRoleCache.clear();
-
-      setUser(null);
-      setSession(null);
-      setUserRole(null);
-    } catch (error) {
-      if (process.env.NODE_ENV === "development") {
-        console.error("Error in signOut:", error);
+      try {
+        // Try to sign out through Supabase
+        await supabase.auth.signOut();
+      } catch (error) {
+        // If session is already missing, that's fine - we're logging out anyway
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error in signOut:", error);
+        }
+      } finally {
+        // Always clear the local state regardless of API success
+        userRoleCache.clear();
+        setUser(null);
+        setSession(null);
+        setUserRole(null);
       }
-      throw error;
     } finally {
       setLoading(false);
     }

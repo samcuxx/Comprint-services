@@ -10,9 +10,11 @@ import {
   ShoppingCart,
   UserCircle,
   Briefcase,
+  Package,
+  FolderClosed,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
-import { UserRole } from "@/lib/types";
+import { UserRole } from "@/lib/database.types";
 import {
   Tooltip,
   TooltipContent,
@@ -41,6 +43,18 @@ const adminNavItems: NavItem[] = [
     description: "Manage employee accounts",
   },
   {
+    title: "Products",
+    href: "/dashboard/products",
+    icon: Package,
+    description: "Manage product inventory",
+  },
+  {
+    title: "Categories",
+    href: "/dashboard/product-categories",
+    icon: FolderClosed,
+    description: "Manage product categories",
+  },
+  {
     title: "Profile",
     href: "/dashboard/profile",
     icon: UserCircle,
@@ -56,10 +70,10 @@ const salesNavItems: NavItem[] = [
     description: "Your performance metrics",
   },
   {
-    title: "Sales",
-    href: "/dashboard/sales",
-    icon: ShoppingCart,
-    description: "Record and track sales",
+    title: "Products",
+    href: "/dashboard/products",
+    icon: Package,
+    description: "View product inventory",
   },
   {
     title: "Profile",
@@ -112,14 +126,14 @@ export function Sidebar() {
   const navItems = getNavItems(userRole);
 
   return (
-    <aside className="flex h-full w-64 flex-col border-r bg-background shadow-sm">
-      <div className="flex h-16 items-center border-b px-6">
+    <aside className="flex flex-col w-64 h-full border-r shadow-sm bg-background">
+      <div className="flex items-center h-16 px-6 border-b">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <Briefcase className="h-5 w-5 text-primary" />
+          <Briefcase className="w-5 h-5 text-primary" />
           <h1 className="text-lg font-semibold">Comprint Services</h1>
         </Link>
       </div>
-      <nav className="flex-1 space-y-1 p-4">
+      <nav className="flex-1 p-4 space-y-1">
         <TooltipProvider delayDuration={300}>
           {navItems.map((item) => (
             <Tooltip key={item.href}>
@@ -153,7 +167,7 @@ export function Sidebar() {
           ))}
         </TooltipProvider>
       </nav>
-      <div className="border-t p-4">
+      <div className="p-4 border-t">
         <div className="text-xs text-muted-foreground">
           Comprint Services &copy; {new Date().getFullYear()}
         </div>

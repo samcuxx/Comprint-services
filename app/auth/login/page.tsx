@@ -23,7 +23,6 @@ export default function LoginPage() {
     {}
   );
   const { signIn } = useAuth();
-  const router = useRouter();
   const { toast } = useToast();
 
   const validateForm = (): boolean => {
@@ -61,7 +60,6 @@ export default function LoginPage() {
 
     try {
       await signIn(email, password);
-      // The auth context will redirect to dashboard on success
     } catch (err) {
       const error = err as Error;
       toast({
@@ -74,19 +72,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 dark:bg-gray-900">
-      <div className="w-full max-w-md">
-        <Card className="border-none shadow-lg">
-          <CardHeader className="space-y-1 text-center">
-            <h1 className="text-2xl font-bold tracking-tight">Welcome back</h1>
-            <p className="text-sm text-muted-foreground">
-              Enter your credentials to access your account
-            </p>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-pink-500/20 dark:from-blue-950 dark:via-purple-950 dark:to-pink-950">
+      <div className="w-full max-w-md px-4">
+        <Card className="border-0 shadow-2xl backdrop-blur-sm bg-white/80 dark:bg-gray-950/80 rounded-2xl">
+          <CardHeader className="pb-6 space-y-2 text-center">
+            <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-500 dark:to-blue-300">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Mualish Plus Global</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Please sign in to access your account</p>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -94,22 +95,17 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
-                    if (errors.email) {
-                      setErrors((prev) => ({ ...prev, email: undefined }));
-                    }
+                    if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
                   }}
                   disabled={isLoading}
-                  aria-invalid={!!errors.email}
-                  className={errors.email ? "border-red-500" : ""}
+                  className={`rounded-lg bg-gray-50 dark:bg-gray-800 border ${
+                    errors.email ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'
+                  } focus:ring-2 focus:ring-blue-500 dark:text-white dark:placeholder-gray-400`}
                 />
-                {errors.email && (
-                  <p className="text-xs text-red-500">{errors.email}</p>
-                )}
+                {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
               </div>
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
-                </div>
+                <Label htmlFor="password" className="text-gray-700 dark:text-gray-300">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -117,27 +113,23 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
-                    if (errors.password) {
-                      setErrors((prev) => ({ ...prev, password: undefined }));
-                    }
+                    if (errors.password) setErrors((prev) => ({ ...prev, password: undefined }));
                   }}
                   disabled={isLoading}
-                  aria-invalid={!!errors.password}
-                  className={errors.password ? "border-red-500" : ""}
+                  className={`rounded-lg bg-gray-50 dark:bg-gray-800 border ${
+                    errors.password ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'
+                  } focus:ring-2 focus:ring-blue-500 dark:text-white dark:placeholder-gray-400`}
                 />
-                {errors.password && (
-                  <p className="text-xs text-red-500">{errors.password}</p>
-                )}
+                {errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
               </div>
               <Button
                 type="submit"
-                className="w-full"
                 disabled={isLoading}
-                aria-label="Sign in to your account"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500 dark:from-blue-500 dark:to-blue-300 dark:hover:from-blue-600 dark:hover:to-blue-400 text-white rounded-lg py-2.5 transition-all duration-200 transform hover:scale-[1.02]"
               >
                 {isLoading ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="w-5 h-5 animate-spin" />
                     Signing in...
                   </span>
                 ) : (
@@ -146,10 +138,9 @@ export default function LoginPage() {
               </Button>
             </form>
           </CardContent>
-          <CardFooter className="text-center text-sm text-muted-foreground">
-            <p className="w-full">
-              Contact your administrator if you need help accessing your
-              account.
+          <CardFooter className="pb-6 text-center">
+            <p className="w-full text-sm text-gray-500 dark:text-gray-400">
+              Contact your administrator if you need help accessing your account
             </p>
           </CardFooter>
         </Card>
