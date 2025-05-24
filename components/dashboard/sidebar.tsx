@@ -13,6 +13,7 @@ import {
   FolderClosed,
   PackageOpen,
   User,
+  ShoppingCart,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { UserRole } from "@/lib/database.types";
@@ -56,6 +57,12 @@ const adminNavItems: NavItem[] = [
     description: "Manage stock levels",
   },
   {
+    title: "Sales",
+    href: "/dashboard/sales",
+    icon: ShoppingCart,
+    description: "Manage sales and invoices",
+  },
+  {
     title: "Customers",
     href: "/dashboard/customers",
     icon: User,
@@ -93,6 +100,12 @@ const salesNavItems: NavItem[] = [
     href: "/dashboard/inventory",
     icon: PackageOpen,
     description: "View stock levels",
+  },
+  {
+    title: "Sales",
+    href: "/dashboard/sales",
+    icon: ShoppingCart,
+    description: "Create and manage sales",
   },
   {
     title: "Customers",
