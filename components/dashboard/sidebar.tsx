@@ -161,13 +161,13 @@ const salesNavItems: NavItem[] = [
     description: "Create service requests",
     gradient: "from-indigo-500 to-purple-500",
   },
-  {
-    title: "Service Tracking",
-    href: "/dashboard/services/tracking",
-    icon: BarChart3,
-    description: "View service analytics",
-    gradient: "from-cyan-500 to-blue-500",
-  },
+  // {
+  //   title: "Service Tracking",
+  //   href: "/dashboard/services/tracking",
+  //   icon: BarChart3,
+  //   description: "View service analytics",
+  //   gradient: "from-cyan-500 to-blue-500",
+  // },
   {
     title: "Commissions",
     href: "/dashboard/commissions",
@@ -175,13 +175,13 @@ const salesNavItems: NavItem[] = [
     description: "View your commissions",
     gradient: "from-yellow-500 to-orange-500",
   },
-  {
-    title: "Reports",
-    href: "/dashboard/reports",
-    icon: BarChart3,
-    description: "View sales reports",
-    gradient: "from-violet-500 to-purple-500",
-  },
+  // {
+  //   title: "Reports",
+  //   href: "/dashboard/reports",
+  //   icon: BarChart3,
+  //   description: "View sales reports",
+  //   gradient: "from-violet-500 to-purple-500",
+  // },
   {
     title: "Customers",
     href: "/dashboard/customers",
@@ -189,13 +189,13 @@ const salesNavItems: NavItem[] = [
     description: "Manage customers",
     gradient: "from-pink-500 to-rose-500",
   },
-  {
-    title: "Profile",
-    href: "/dashboard/profile",
-    icon: UserCircle,
-    description: "Update your profile",
-    gradient: "from-blue-500 to-indigo-500",
-  },
+  // {
+  //   title: "Profile",
+  //   href: "/dashboard/profile",
+  //   icon: UserCircle,
+  //   description: "Update your profile",
+  //   gradient: "from-blue-500 to-indigo-500",
+  // },
 ];
 
 const technicianNavItems: NavItem[] = [
@@ -215,12 +215,19 @@ const technicianNavItems: NavItem[] = [
     badge: "Active",
   },
   {
-    title: "Profile",
-    href: "/dashboard/profile",
-    icon: UserCircle,
-    description: "Update your profile",
-    gradient: "from-blue-500 to-indigo-500",
+    title: "Service Tracking",
+    href: "/dashboard/services/tracking",
+    icon: BarChart3,
+    description: "Service analytics and tracking",
+    gradient: "from-cyan-500 to-blue-500",
   },
+  // {
+  //   title: "Profile",
+  //   href: "/dashboard/profile",
+  //   icon: UserCircle,
+  //   description: "Update your profile",
+  //   gradient: "from-blue-500 to-indigo-500",
+  // },
 ];
 
 export function Sidebar() {
