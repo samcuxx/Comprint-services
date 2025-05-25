@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createServerClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
   try {
     // Create a Supabase client
-    const supabase = createServerComponentClient({ cookies });
+    const supabase = createServerClient();
 
     // Check authentication
     const {
