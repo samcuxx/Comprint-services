@@ -128,9 +128,7 @@ export default function LoginPage() {
           <Card className="border-0 shadow-2xl backdrop-blur-sm bg-white/80 dark:bg-gray-950/80 rounded-2xl overflow-hidden relative">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 dark:from-blue-400/10 dark:to-purple-400/10"></div>
 
-            <CardHeader className="relative z-10 pb-6 space-y-4 text-center">
-         
-            </CardHeader>
+            <CardHeader className="relative z-10 pb-6 space-y-4 text-center"></CardHeader>
 
             <CardContent className="relative z-10 px-8">
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -243,7 +241,6 @@ export default function LoginPage() {
               </div>
             </CardFooter>
           </Card>
-     
         </div>
       </div>
     </div>
