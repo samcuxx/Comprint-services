@@ -233,7 +233,7 @@ export default function EmployeesPage() {
                             <Power className="h-4 w-4 text-green-500" />
                           )}
                         </Button>
-                        <Button
+                        {/* <Button
                           variant="outline"
                           size="sm"
                           onClick={() => {
@@ -243,7 +243,7 @@ export default function EmployeesPage() {
                           aria-label={`Delete ${employee.full_name}`}
                         >
                           <Trash2 className="h-4 w-4 text-red-500" />
-                        </Button>
+                        </Button> */}
                       </div>
                     </td>
                   </tr>
