@@ -132,6 +132,7 @@ export async function POST(request: NextRequest) {
     }));
 
     // Insert the sale items
+    // The database trigger will automatically create the commission record
     const { error: itemsError } = await supabase
       .from("sale_items")
       .insert(itemsWithSaleId);
@@ -140,35 +141,6 @@ export async function POST(request: NextRequest) {
       console.error("Error creating sale items:", itemsError);
       // Note: In a real transaction we would roll back the sale, but Supabase doesn't support transactions directly
       return NextResponse.json({ error: itemsError.message }, { status: 500 });
-    }
-
-    // Calculate total commission amount for this sale
-    const totalCommissionAmount = validatedSaleItems.reduce(
-      (sum, item) =>
-        sum + item.quantity * item.unit_price * (item.commission_rate / 100),
-      0
-    );
-
-    // Create commission record if commission amount is greater than 0
-    if (totalCommissionAmount > 0) {
-      const { error: commissionError } = await supabase
-        .from("sales_commissions")
-        .insert([
-          {
-            sale_id: newSale.id,
-            sales_person_id: validatedSale.sales_person_id,
-            commission_amount: totalCommissionAmount,
-            is_paid: false,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          },
-        ]);
-
-      if (commissionError) {
-        console.error("Error creating commission record:", commissionError);
-        // We'll continue even if commission creation fails
-        // but log the error for troubleshooting
-      }
     }
 
     return NextResponse.json({ data: newSale }, { status: 201 });

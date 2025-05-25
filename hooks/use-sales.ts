@@ -193,7 +193,13 @@ export const useCreateSale = () => {
       return newSale;
     },
     onSuccess: () => {
+      // Invalidate sales cache
       queryClient.invalidateQueries({ queryKey: ["sales"] });
+
+      // Invalidate commissions cache since database trigger creates commission records
+      queryClient.invalidateQueries({ queryKey: ["commissions"] });
+      queryClient.invalidateQueries({ queryKey: ["commissions-summary"] });
+      queryClient.invalidateQueries({ queryKey: ["commission-stats"] });
     },
   });
 };
@@ -247,7 +253,13 @@ export const useDeleteSale = () => {
       return id;
     },
     onSuccess: () => {
+      // Invalidate sales cache
       queryClient.invalidateQueries({ queryKey: ["sales"] });
+
+      // Invalidate commissions cache since associated commission is deleted
+      queryClient.invalidateQueries({ queryKey: ["commissions"] });
+      queryClient.invalidateQueries({ queryKey: ["commissions-summary"] });
+      queryClient.invalidateQueries({ queryKey: ["commission-stats"] });
     },
   });
 };

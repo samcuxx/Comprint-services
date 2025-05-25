@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import {
   useCommissions,
   useUpdateCommission,
-  useSyncCommissions,
+  useBulkPayCommissions,
 } from "@/hooks/use-commissions";
 import { useSalesPersons } from "@/hooks/use-sales";
 import { Button } from "@/components/ui/button";
@@ -44,17 +44,51 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
   Calendar,
   Check,
   ChevronDown,
+  ChevronRight,
   DollarSign,
   Filter,
   MoreHorizontal,
   Search,
   User,
   X,
+  CreditCard,
+  Users,
+  CalendarDays,
 } from "lucide-react";
 import Link from "next/link";
+
+interface GroupedCommission {
+  salesPerson: {
+    id: string;
+    full_name: string;
+  };
+  dates: {
+    date: string;
+    commissions: Array<{
+      id: string;
+      commission_amount: number;
+      is_paid: boolean;
+      payment_date: string | null;
+      created_at: string;
+      sale?: {
+        id: string;
+        invoice_number: string;
+      };
+    }>;
+    totalAmount: number;
+    unpaidAmount: number;
+    paidAmount: number;
+    hasUnpaid: boolean;
+  }[];
+}
 
 export function CommissionList() {
   const [filters, setFilters] = useState({
@@ -66,9 +100,14 @@ export function CommissionList() {
   const [selectedCommissionId, setSelectedCommissionId] = useState<
     string | null
   >(null);
+  const [selectedBulkPayment, setSelectedBulkPayment] = useState<{
+    salesPersonId: string;
+    date: string;
+    salesPersonName: string;
+  } | null>(null);
   const [isPayoutDialogOpen, setIsPayoutDialogOpen] = useState(false);
-  const [isFixingCommission, setIsFixingCommission] = useState(false);
-  const [isFixingAllCommissions, setIsFixingAllCommissions] = useState(false);
+  const [isBulkPayoutDialogOpen, setIsBulkPayoutDialogOpen] = useState(false);
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
   // Get current user to check role
@@ -98,9 +137,72 @@ export function CommissionList() {
 
   // Update commission mutation (mark as paid)
   const updateCommissionMutation = useUpdateCommission();
+  const bulkPayCommissionsMutation = useBulkPayCommissions();
 
-  // Add the sync commission mutation
-  const syncCommissionMutation = useSyncCommissions();
+  // Group commissions by sales person and date
+  const groupedCommissions: GroupedCommission[] = React.useMemo(() => {
+    const groups = new Map<string, GroupedCommission>();
+
+    commissions.forEach((commission) => {
+      if (!commission.sales_person) return;
+
+      const salesPersonId = commission.sales_person.id;
+      const commissionDate = format(
+        new Date(commission.created_at),
+        "yyyy-MM-dd"
+      );
+
+      if (!groups.has(salesPersonId)) {
+        groups.set(salesPersonId, {
+          salesPerson: commission.sales_person,
+          dates: [],
+        });
+      }
+
+      const group = groups.get(salesPersonId)!;
+      let dateGroup = group.dates.find((d) => d.date === commissionDate);
+
+      if (!dateGroup) {
+        dateGroup = {
+          date: commissionDate,
+          commissions: [],
+          totalAmount: 0,
+          unpaidAmount: 0,
+          paidAmount: 0,
+          hasUnpaid: false,
+        };
+        group.dates.push(dateGroup);
+      }
+
+      dateGroup.commissions.push({
+        id: commission.id,
+        commission_amount: commission.commission_amount,
+        is_paid: commission.is_paid,
+        payment_date: commission.payment_date,
+        created_at: commission.created_at,
+        sale: commission.sale,
+      });
+
+      dateGroup.totalAmount += commission.commission_amount;
+      if (commission.is_paid) {
+        dateGroup.paidAmount += commission.commission_amount;
+      } else {
+        dateGroup.unpaidAmount += commission.commission_amount;
+        dateGroup.hasUnpaid = true;
+      }
+    });
+
+    // Sort dates in descending order for each sales person
+    groups.forEach((group) => {
+      group.dates.sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+    });
+
+    return Array.from(groups.values()).sort((a, b) =>
+      a.salesPerson.full_name.localeCompare(b.salesPerson.full_name)
+    );
+  }, [commissions]);
 
   const handlePayCommission = async () => {
     if (!selectedCommissionId) return;
@@ -130,15 +232,22 @@ export function CommissionList() {
     }
   };
 
-  // Add a function to fix commission amount
-  const handleFixCommission = async (commissionId: string) => {
-    setIsFixingCommission(true);
+  const handleBulkPayCommissions = async () => {
+    if (!selectedBulkPayment) return;
+
     try {
-      await syncCommissionMutation.mutateAsync(commissionId);
+      const result = await bulkPayCommissionsMutation.mutateAsync({
+        salesPersonId: selectedBulkPayment.salesPersonId,
+        date: selectedBulkPayment.date,
+      });
+
       toast({
         title: "Success",
-        description: "Commission amount updated successfully",
+        description: `Successfully marked ${result.length} commissions as paid for ${selectedBulkPayment.salesPersonName}`,
       });
+
+      setIsBulkPayoutDialogOpen(false);
+      setSelectedBulkPayment(null);
     } catch (error: unknown) {
       toast({
         variant: "destructive",
@@ -146,59 +255,19 @@ export function CommissionList() {
         description:
           error instanceof Error
             ? error.message
-            : "Failed to update commission amount",
+            : "Failed to process bulk payment",
       });
-    } finally {
-      setIsFixingCommission(false);
     }
   };
 
-  // Add a function to fix all commission amounts that are zero
-  const handleFixAllCommissions = async () => {
-    const commissionsToFix = commissions.filter(
-      (commission) =>
-        commission.commission_amount === 0 || !commission.commission_amount
-    );
-
-    if (commissionsToFix.length === 0) {
-      toast({
-        title: "No commissions to fix",
-        description: "All commissions already have proper amounts",
-      });
-      return;
+  const toggleGroup = (salesPersonId: string) => {
+    const newOpenGroups = new Set(openGroups);
+    if (newOpenGroups.has(salesPersonId)) {
+      newOpenGroups.delete(salesPersonId);
+    } else {
+      newOpenGroups.add(salesPersonId);
     }
-
-    setIsFixingAllCommissions(true);
-    let successCount = 0;
-    let errorCount = 0;
-
-    try {
-      // Process each commission sequentially
-      for (const commission of commissionsToFix) {
-        try {
-          await syncCommissionMutation.mutateAsync(commission.id);
-          successCount++;
-        } catch (error) {
-          console.error(`Failed to fix commission ${commission.id}:`, error);
-          errorCount++;
-        }
-      }
-
-      toast({
-        title: "Commission Fix Completed",
-        description: `Successfully fixed ${successCount} commissions. ${
-          errorCount > 0 ? `Failed to fix ${errorCount} commissions.` : ""
-        }`,
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "An error occurred while fixing commissions",
-      });
-    } finally {
-      setIsFixingAllCommissions(false);
-    }
+    setOpenGroups(newOpenGroups);
   };
 
   const clearFilters = () => {
@@ -239,6 +308,7 @@ export function CommissionList() {
 
   return (
     <div className="space-y-6">
+      {/* Filters */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center space-x-2">
           <Popover>
@@ -385,151 +455,229 @@ export function CommissionList() {
             </Button>
           )}
         </div>
+      </div>
 
-        {isAdmin && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleFixAllCommissions}
-            disabled={isFixingAllCommissions}
-            className="h-9"
-          >
-            <DollarSign className="mr-2 h-4 w-4" />
-            {isFixingAllCommissions
-              ? "Fixing Commissions..."
-              : "Fix All Zero Commissions"}
-          </Button>
+      {/* Grouped Commissions */}
+      <div className="space-y-4">
+        {groupedCommissions.length === 0 ? (
+          <div className="text-center py-12">
+            <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No commissions found</h3>
+            <p className="text-muted-foreground">
+              {activeFiltersCount > 0
+                ? "No commissions match your filter criteria"
+                : "No commissions have been recorded yet"}
+            </p>
+          </div>
+        ) : (
+          groupedCommissions.map((group) => (
+            <div
+              key={group.salesPerson.id}
+              className="border rounded-lg shadow-sm"
+            >
+              <Collapsible
+                open={openGroups.has(group.salesPerson.id)}
+                onOpenChange={() => toggleGroup(group.salesPerson.id)}
+              >
+                <CollapsibleTrigger className="w-full">
+                  <div className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
+                    <div className="flex items-center space-x-3">
+                      {openGroups.has(group.salesPerson.id) ? (
+                        <ChevronDown className="h-4 w-4" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4" />
+                      )}
+                      <div className="flex items-center space-x-3">
+                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                          <User className="h-4 w-4 text-primary" />
+                        </div>
+                        <div className="text-left">
+                          <h3 className="font-semibold">
+                            {group.salesPerson.full_name}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {group.dates.length} day
+                            {group.dates.length !== 1 ? "s" : ""} with
+                            commissions
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold">
+                        {formatCurrency(
+                          group.dates.reduce(
+                            (sum, date) => sum + date.totalAmount,
+                            0
+                          )
+                        )}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Total commissions
+                      </div>
+                    </div>
+                  </div>
+                </CollapsibleTrigger>
+
+                <CollapsibleContent>
+                  <div className="border-t">
+                    {group.dates.map((dateGroup) => (
+                      <div
+                        key={dateGroup.date}
+                        className="border-b last:border-b-0"
+                      >
+                        <div className="flex items-center justify-between p-4 bg-muted/20">
+                          <div className="flex items-center space-x-3">
+                            <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                            <div>
+                              <div className="font-medium">
+                                {format(
+                                  new Date(dateGroup.date),
+                                  "EEEE, MMMM d, yyyy"
+                                )}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                {dateGroup.commissions.length} commission
+                                {dateGroup.commissions.length !== 1 ? "s" : ""}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-4">
+                            <div className="text-right">
+                              <div className="font-semibold">
+                                {formatCurrency(dateGroup.totalAmount)}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                {dateGroup.hasUnpaid && (
+                                  <span className="text-amber-600">
+                                    {formatCurrency(dateGroup.unpaidAmount)}{" "}
+                                    unpaid
+                                  </span>
+                                )}
+                                {!dateGroup.hasUnpaid && (
+                                  <span className="text-green-600">
+                                    All paid
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            {isAdmin && dateGroup.hasUnpaid && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedBulkPayment({
+                                    salesPersonId: group.salesPerson.id,
+                                    date: dateGroup.date,
+                                    salesPersonName:
+                                      group.salesPerson.full_name,
+                                  });
+                                  setIsBulkPayoutDialogOpen(true);
+                                }}
+                                disabled={bulkPayCommissionsMutation.isPending}
+                              >
+                                <CreditCard className="h-3 w-3 mr-1" />
+                                Pay All (
+                                {formatCurrency(dateGroup.unpaidAmount)})
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Individual Commissions */}
+                        <div className="divide-y">
+                          {dateGroup.commissions.map((commission) => (
+                            <div
+                              key={commission.id}
+                              className="p-4 pl-12 hover:bg-muted/30 transition-colors"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                  <div className="text-sm">
+                                    {commission.sale && (
+                                      <Link
+                                        href={`/dashboard/sales/${commission.sale.id}`}
+                                        className="text-primary hover:underline font-medium"
+                                      >
+                                        {commission.sale.invoice_number}
+                                      </Link>
+                                    )}
+                                  </div>
+                                  <Badge
+                                    variant={
+                                      commission.is_paid ? "success" : "outline"
+                                    }
+                                  >
+                                    {commission.is_paid ? "Paid" : "Unpaid"}
+                                  </Badge>
+                                </div>
+                                <div className="flex items-center space-x-3">
+                                  <div className="text-right">
+                                    <div className="font-medium">
+                                      {formatCurrency(
+                                        commission.commission_amount
+                                      )}
+                                    </div>
+                                    {commission.payment_date && (
+                                      <div className="text-xs text-muted-foreground">
+                                        Paid{" "}
+                                        {format(
+                                          new Date(commission.payment_date),
+                                          "MMM d"
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="ghost" size="sm">
+                                        <MoreHorizontal className="h-4 w-4" />
+                                        <span className="sr-only">Actions</span>
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      {commission.sale && (
+                                        <DropdownMenuItem asChild>
+                                          <Link
+                                            href={`/dashboard/sales/${commission.sale.id}`}
+                                          >
+                                            View Sale Details
+                                          </Link>
+                                        </DropdownMenuItem>
+                                      )}
+                                      {isAdmin && !commission.is_paid && (
+                                        <DropdownMenuItem
+                                          onClick={() => {
+                                            setSelectedCommissionId(
+                                              commission.id
+                                            );
+                                            setIsPayoutDialogOpen(true);
+                                          }}
+                                        >
+                                          <Check className="mr-2 h-4 w-4" />
+                                          Mark as Paid
+                                        </DropdownMenuItem>
+                                      )}
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            </div>
+          ))
         )}
       </div>
 
-      <div className="rounded-md border shadow">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b bg-muted/50">
-                <th className="p-4 text-left font-medium">Date</th>
-                <th className="p-4 text-left font-medium">Invoice</th>
-                {isAdmin && (
-                  <th className="p-4 text-left font-medium">Sales Person</th>
-                )}
-                <th className="p-4 text-left font-medium">Amount</th>
-                <th className="p-4 text-left font-medium">Status</th>
-                <th className="p-4 text-left font-medium">Payment Date</th>
-                <th className="p-4 text-left font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {commissions.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={isAdmin ? 7 : 6}
-                    className="p-8 text-center text-muted-foreground"
-                  >
-                    {activeFiltersCount > 0
-                      ? "No commissions match your filter criteria"
-                      : "No commissions found"}
-                  </td>
-                </tr>
-              ) : (
-                commissions.map((commission) => (
-                  <tr
-                    key={commission.id}
-                    className="border-b hover:bg-muted/30 transition-colors"
-                  >
-                    <td className="p-4">
-                      {format(new Date(commission.created_at), "MMM dd, yyyy")}
-                    </td>
-                    <td className="p-4">
-                      {commission.sale && (
-                        <Link
-                          href={`/dashboard/sales/${commission.sale.id}`}
-                          className="text-primary hover:underline"
-                        >
-                          {commission.sale.invoice_number}
-                        </Link>
-                      )}
-                    </td>
-                    {isAdmin && (
-                      <td className="p-4">
-                        {commission.sales_person && (
-                          <div className="flex items-center">
-                            <User className="mr-2 h-4 w-4 text-muted-foreground" />
-                            <span>{commission.sales_person.full_name}</span>
-                          </div>
-                        )}
-                      </td>
-                    )}
-                    <td className="p-4 font-medium">
-                      {formatCurrency(commission.commission_amount)}
-                    </td>
-                    <td className="p-4">
-                      <Badge
-                        variant={commission.is_paid ? "success" : "outline"}
-                      >
-                        {commission.is_paid ? "Paid" : "Unpaid"}
-                      </Badge>
-                    </td>
-                    <td className="p-4">
-                      {commission.payment_date
-                        ? format(
-                            new Date(commission.payment_date),
-                            "MMM dd, yyyy"
-                          )
-                        : "-"}
-                    </td>
-                    <td className="p-4">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Actions</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          {commission.sale && (
-                            <DropdownMenuItem asChild>
-                              <Link
-                                href={`/dashboard/sales/${commission.sale.id}`}
-                              >
-                                View Sale Details
-                              </Link>
-                            </DropdownMenuItem>
-                          )}
-                          {(commission.commission_amount === 0 ||
-                            !commission.commission_amount) && (
-                            <DropdownMenuItem
-                              onClick={() => handleFixCommission(commission.id)}
-                              disabled={
-                                isFixingCommission ||
-                                syncCommissionMutation.isPending
-                              }
-                            >
-                              <DollarSign className="mr-2 h-4 w-4" />
-                              Fix Commission Amount
-                            </DropdownMenuItem>
-                          )}
-                          {isAdmin && !commission.is_paid && (
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setSelectedCommissionId(commission.id);
-                                setIsPayoutDialogOpen(true);
-                              }}
-                            >
-                              <Check className="mr-2 h-4 w-4" />
-                              Mark as Paid
-                            </DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
+      {/* Individual Commission Payment Dialog */}
       <AlertDialog
         open={isPayoutDialogOpen}
         onOpenChange={setIsPayoutDialogOpen}
@@ -559,6 +707,46 @@ export function CommissionList() {
               {updateCommissionMutation.isPending
                 ? "Processing..."
                 : "Confirm Payment"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Payment Dialog */}
+      <AlertDialog
+        open={isBulkPayoutDialogOpen}
+        onOpenChange={setIsBulkPayoutDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Bulk Commission Payment</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to mark all unpaid commissions for{" "}
+              <strong>{selectedBulkPayment?.salesPersonName}</strong> on{" "}
+              <strong>
+                {selectedBulkPayment &&
+                  format(new Date(selectedBulkPayment.date), "MMMM d, yyyy")}
+              </strong>{" "}
+              as paid? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                setIsBulkPayoutDialogOpen(false);
+                setSelectedBulkPayment(null);
+              }}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkPayCommissions}
+              className="bg-green-600 hover:bg-green-700"
+              disabled={bulkPayCommissionsMutation.isPending}
+            >
+              {bulkPayCommissionsMutation.isPending
+                ? "Processing..."
+                : "Confirm Bulk Payment"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

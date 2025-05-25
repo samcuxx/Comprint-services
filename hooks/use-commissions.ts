@@ -58,6 +58,9 @@ export const useCommissions = (
 
       return data || [];
     },
+    staleTime: 0, // Always consider data stale to refetch frequently
+    refetchOnWindowFocus: true, // Refetch when user focuses window
+    refetchOnMount: true, // Always refetch when component mounts
   });
 };
 
@@ -141,6 +144,8 @@ export const useCommissionsSummary = (salesPersonId: string | undefined) => {
       };
     },
     enabled: !!salesPersonId,
+    staleTime: 30000, // 30 seconds stale time for summary data
+    refetchOnWindowFocus: true,
   });
 };
 
@@ -177,6 +182,52 @@ export const useUpdateCommission = () => {
       queryClient.invalidateQueries({
         queryKey: ["commissions-summary"],
       });
+    },
+  });
+};
+
+/**
+ * Hook to mark all commissions for a sales person on a specific date as paid
+ */
+export const useBulkPayCommissions = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      salesPersonId,
+      date,
+    }: {
+      salesPersonId: string;
+      date: string; // YYYY-MM-DD format
+    }) => {
+      // Get the start and end of the day
+      const startDate = `${date}T00:00:00.000Z`;
+      const endDate = `${date}T23:59:59.999Z`;
+
+      // Update all unpaid commissions for this sales person on this date
+      const { data, error } = await supabase
+        .from("sales_commissions")
+        .update({
+          is_paid: true,
+          payment_date: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("sales_person_id", salesPersonId)
+        .eq("is_paid", false)
+        .gte("created_at", startDate)
+        .lte("created_at", endDate)
+        .select();
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["commissions"] });
+      queryClient.invalidateQueries({ queryKey: ["commissions-summary"] });
+      queryClient.invalidateQueries({ queryKey: ["commission-stats"] });
     },
   });
 };
@@ -271,74 +322,7 @@ export const useCommissionStats = () => {
         topPerformers: performersArray.slice(0, 5), // Top 5 performers
       };
     },
-  });
-};
-
-/**
- * Hook to sync commission amounts with sale items commission data
- * This is used to fix commission records that have incorrect amounts (showing as 0)
- */
-export const useSyncCommissions = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (commissionId: string) => {
-      // First, get the commission record to find the associated sale
-      const { data: commission, error: commissionError } = await supabase
-        .from("sales_commissions")
-        .select("*")
-        .eq("id", commissionId)
-        .single();
-
-      if (commissionError) {
-        throw new Error(
-          `Error fetching commission: ${commissionError.message}`
-        );
-      }
-
-      if (!commission.sale_id) {
-        throw new Error("Commission does not have an associated sale");
-      }
-
-      // Get the sale items to calculate the correct commission amount
-      const { data: saleItems, error: saleItemsError } = await supabase
-        .from("sale_items")
-        .select("*")
-        .eq("sale_id", commission.sale_id);
-
-      if (saleItemsError) {
-        throw new Error(`Error fetching sale items: ${saleItemsError.message}`);
-      }
-
-      // Calculate the correct commission amount
-      const totalCommissionAmount = saleItems.reduce(
-        (sum, item) =>
-          sum + item.quantity * item.unit_price * (item.commission_rate / 100),
-        0
-      );
-
-      // Update the commission record with the correct amount
-      const { data: updatedCommission, error: updateError } = await supabase
-        .from("sales_commissions")
-        .update({
-          commission_amount: totalCommissionAmount,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", commissionId)
-        .select()
-        .single();
-
-      if (updateError) {
-        throw new Error(`Error updating commission: ${updateError.message}`);
-      }
-
-      return updatedCommission;
-    },
-    onSuccess: () => {
-      // Invalidate related queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ["commissions"] });
-      queryClient.invalidateQueries({ queryKey: ["commissions-summary"] });
-      queryClient.invalidateQueries({ queryKey: ["commission-stats"] });
-    },
+    staleTime: 60000, // 1 minute stale time for stats
+    refetchOnWindowFocus: true,
   });
 };
