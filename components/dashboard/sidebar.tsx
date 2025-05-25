@@ -65,6 +65,18 @@ const adminNavItems: NavItem[] = [
     description: "Manage sales and invoices",
   },
   {
+    title: "Services",
+    href: "/dashboard/services",
+    icon: Wrench,
+    description: "Manage service requests",
+  },
+  {
+    title: "Service Tracking",
+    href: "/dashboard/services/tracking",
+    icon: BarChart3,
+    description: "Service analytics and tracking",
+  },
+  {
     title: "Commissions",
     href: "/dashboard/commissions",
     icon: CircleDollarSign,
@@ -122,6 +134,18 @@ const salesNavItems: NavItem[] = [
     description: "Create and manage sales",
   },
   {
+    title: "Services",
+    href: "/dashboard/services",
+    icon: Wrench,
+    description: "Create service requests",
+  },
+  {
+    title: "Service Tracking",
+    href: "/dashboard/services/tracking",
+    icon: BarChart3,
+    description: "View service analytics",
+  },
+  {
     title: "Commissions",
     href: "/dashboard/commissions",
     icon: CircleDollarSign,
@@ -158,7 +182,7 @@ const technicianNavItems: NavItem[] = [
     title: "Services",
     href: "/dashboard/services",
     icon: Wrench,
-    description: "Manage service requests",
+    description: "Manage assigned service requests",
   },
   {
     title: "Profile",

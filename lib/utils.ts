@@ -21,6 +21,34 @@ export function formatCurrency(amount: number, currency = "GHS") {
 }
 
 /**
+ * Format a date string to a readable format
+ * @param dateString ISO date string
+ * @returns Formatted date string
+ */
+export function formatDate(dateString: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(new Date(dateString));
+}
+
+/**
+ * Format a date string to include time
+ * @param dateString ISO date string
+ * @returns Formatted date and time string
+ */
+export function formatDateTime(dateString: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(dateString));
+}
+
+/**
  * Generate a random SKU for products
  * @param prefix Optional prefix for the SKU
  * @returns A random SKU string

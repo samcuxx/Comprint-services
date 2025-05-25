@@ -344,3 +344,131 @@ export interface Database {
     };
   };
 }
+
+export interface ServiceCategory {
+  id: string;
+  name: string;
+  description: string | null;
+  estimated_duration: number;
+  base_price: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ServiceRequest {
+  id: string;
+  request_number: string;
+  customer_id: string | null;
+  service_category_id: string;
+  assigned_technician_id: string | null;
+  created_by: string;
+
+  // Request details
+  title: string;
+  description: string;
+  device_type: string | null;
+  device_brand: string | null;
+  device_model: string | null;
+  device_serial_number: string | null;
+
+  // Service details
+  priority: "low" | "medium" | "high" | "urgent";
+  status:
+    | "pending"
+    | "assigned"
+    | "in_progress"
+    | "waiting_parts"
+    | "completed"
+    | "cancelled"
+    | "on_hold";
+
+  // Dates and timing
+  requested_date: string;
+  assigned_date: string | null;
+  started_date: string | null;
+  completed_date: string | null;
+  estimated_completion: string | null;
+
+  // Pricing
+  estimated_cost: number | null;
+  final_cost: number | null;
+  payment_status: "pending" | "paid" | "partial" | "cancelled";
+  payment_method: "cash" | "card" | "transfer" | "check" | "other" | null;
+
+  // Additional info
+  customer_notes: string | null;
+  technician_notes: string | null;
+  internal_notes: string | null;
+
+  created_at: string;
+  updated_at: string;
+
+  // Relations
+  customer?: Customer;
+  service_category?: ServiceCategory;
+  assigned_technician?: User;
+  created_by_user?: User;
+}
+
+export interface ServiceRequestUpdate {
+  id: string;
+  service_request_id: string;
+  updated_by: string;
+
+  // Update details
+  status_from: string | null;
+  status_to: string | null;
+  update_type:
+    | "status_change"
+    | "note_added"
+    | "assignment"
+    | "cost_update"
+    | "completion";
+  title: string;
+  description: string | null;
+
+  // Visibility
+  is_customer_visible: boolean;
+
+  created_at: string;
+
+  // Relations
+  updated_by_user?: User;
+}
+
+export interface ServicePartUsed {
+  id: string;
+  service_request_id: string;
+  product_id: string;
+  quantity: number;
+  unit_cost: number;
+  total_cost: number;
+  added_by: string;
+  created_at: string;
+
+  // Relations
+  product?: Product;
+  added_by_user?: User;
+}
+
+export interface ServiceRequestAttachment {
+  id: string;
+  service_request_id: string;
+  uploaded_by: string;
+
+  // File details
+  file_name: string;
+  file_url: string;
+  file_type: string | null;
+  file_size: number | null;
+
+  // Metadata
+  description: string | null;
+  is_customer_visible: boolean;
+
+  created_at: string;
+
+  // Relations
+  uploaded_by_user?: User;
+}

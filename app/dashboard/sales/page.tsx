@@ -264,11 +264,11 @@ export default function SalesPage() {
                 <div className="space-y-2">
                   <h4 className="font-medium">Customer</h4>
                   <Select
-                    value={filters.customerId}
+                    value={filters.customerId || "all"}
                     onValueChange={(value) =>
                       setFilters({
                         ...filters,
-                        customerId: value || undefined,
+                        customerId: value === "all" ? undefined : value,
                       })
                     }
                   >
@@ -276,7 +276,7 @@ export default function SalesPage() {
                       <SelectValue placeholder="Select customer" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Customers</SelectItem>
+                      <SelectItem value="all">All Customers</SelectItem>
                       {customers.map((customer) => (
                         <SelectItem key={customer.id} value={customer.id}>
                           {customer.name}
@@ -288,11 +288,11 @@ export default function SalesPage() {
                 <div className="space-y-2">
                   <h4 className="font-medium">Payment Status</h4>
                   <Select
-                    value={filters.status}
+                    value={filters.status || "all"}
                     onValueChange={(value) =>
                       setFilters({
                         ...filters,
-                        status: value || undefined,
+                        status: value === "all" ? undefined : value,
                       })
                     }
                   >
@@ -300,7 +300,7 @@ export default function SalesPage() {
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Statuses</SelectItem>
+                      <SelectItem value="all">All Statuses</SelectItem>
                       <SelectItem value="paid">Paid</SelectItem>
                       <SelectItem value="pending">Pending</SelectItem>
                       <SelectItem value="partial">Partial</SelectItem>
