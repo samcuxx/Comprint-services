@@ -39,9 +39,9 @@ export default function ProductDetailPage() {
   if (isError) {
     return (
       <div className="flex h-[70vh] flex-col items-center justify-center space-y-4 text-center">
-        <Package className="h-12 w-12 text-red-500" />
+        <Package className="w-12 h-12 text-red-500" />
         <h2 className="text-xl font-semibold">Error Loading Product</h2>
-        <p className="text-muted-foreground max-w-md">
+        <p className="max-w-md text-muted-foreground">
           {error instanceof Error
             ? error.message
             : "An unexpected error occurred while loading the product details."}
@@ -54,9 +54,9 @@ export default function ProductDetailPage() {
   if (!product) {
     return (
       <div className="flex h-[70vh] flex-col items-center justify-center space-y-4 text-center">
-        <Package className="h-12 w-12 text-muted-foreground" />
+        <Package className="w-12 h-12 text-muted-foreground" />
         <h2 className="text-xl font-semibold">Product Not Found</h2>
-        <p className="text-muted-foreground max-w-md">
+        <p className="max-w-md text-muted-foreground">
           The product you are looking for does not exist or has been removed.
         </p>
         <Button onClick={() => router.push("/dashboard/products")}>
@@ -87,7 +87,7 @@ export default function ProductDetailPage() {
           onClick={() => router.back()}
           className="mr-2"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back
+          <ArrowLeft className="w-4 h-4 mr-2" /> Back
         </Button>
         <h1 className="text-2xl font-bold">{product.name}</h1>
         <Badge variant={product.is_active ? "success" : "destructive"}>
@@ -96,7 +96,7 @@ export default function ProductDetailPage() {
         {isAdmin && (
           <Button asChild variant="outline" size="sm" className="ml-auto">
             <Link href={`/dashboard/products/${product.id}/edit`}>
-              <Pencil className="mr-2 h-4 w-4" /> Edit
+              <Pencil className="w-4 h-4 mr-2" /> Edit
             </Link>
           </Button>
         )}
@@ -105,9 +105,9 @@ export default function ProductDetailPage() {
       <div className="grid gap-8 md:grid-cols-3">
         {/* Product Image */}
         <div className="md:col-span-1">
-          <div className="rounded-md border bg-card overflow-hidden">
+          <div className="overflow-hidden border rounded-md bg-card">
             {product.image_url ? (
-              <div className="aspect-square relative">
+              <div className="relative aspect-square">
                 <img
                   src={product.image_url}
                   alt={product.name}
@@ -115,8 +115,8 @@ export default function ProductDetailPage() {
                 />
               </div>
             ) : (
-              <div className="aspect-square flex items-center justify-center bg-muted">
-                <Package className="h-24 w-24 text-muted-foreground" />
+              <div className="flex items-center justify-center aspect-square bg-muted">
+                <Package className="w-24 h-24 text-muted-foreground" />
               </div>
             )}
           </div>
@@ -128,7 +128,7 @@ export default function ProductDetailPage() {
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground">SKU</p>
               <div className="flex items-center">
-                <Tag className="mr-2 h-4 w-4 text-muted-foreground" />
+                <Tag className="w-4 h-4 mr-2 text-muted-foreground" />
                 <p>{product.sku}</p>
               </div>
             </div>
@@ -143,7 +143,8 @@ export default function ProductDetailPage() {
                 Cost Price
               </p>
               <div className="flex items-center">
-                <DollarSign className="mr-2 h-4 w-4 text-muted-foreground" />
+                {/* <DollarSign className="w-4 h-4 mr-2 text-muted-foreground" /> */}
+                ₵
                 <p>{formatCurrency(product.cost_price)}</p>
               </div>
             </div>
@@ -152,7 +153,7 @@ export default function ProductDetailPage() {
                 Selling Price
               </p>
               <div className="flex items-center">
-                <DollarSign className="mr-2 h-4 w-4 text-muted-foreground" />
+                {/* <DollarSign className="w-4 h-4 mr-2 text-muted-foreground" /> */}
                 <p>{formatCurrency(product.selling_price)}</p>
               </div>
             </div>
@@ -161,7 +162,7 @@ export default function ProductDetailPage() {
                 Commission Rate
               </p>
               <div className="flex items-center">
-                <Percent className="mr-2 h-4 w-4 text-muted-foreground" />
+                <Percent className="w-4 h-4 mr-2 text-muted-foreground" />
                 <p>{product.commission_rate}%</p>
               </div>
             </div>
@@ -170,22 +171,22 @@ export default function ProductDetailPage() {
                 Created At
               </p>
               <div className="flex items-center">
-                <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
+                <Calendar className="w-4 h-4 mr-2 text-muted-foreground" />
                 <p>{new Date(product.created_at).toLocaleDateString()}</p>
               </div>
             </div>
           </div>
 
           {inventory && (
-            <div className="rounded-md border p-4">
-              <h3 className="text-lg font-medium mb-4">Inventory</h3>
+            <div className="p-4 border rounded-md">
+              <h3 className="mb-4 text-lg font-medium">Inventory</h3>
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">
                     Available Quantity
                   </p>
                   <div className="flex items-center">
-                    <ShoppingCart className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <ShoppingCart className="w-4 h-4 mr-2 text-muted-foreground" />
                     <p>{inventory.quantity} units</p>
                   </div>
                 </div>
@@ -201,7 +202,7 @@ export default function ProductDetailPage() {
                       Last Restocked
                     </p>
                     <div className="flex items-center">
-                      <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
+                      <Calendar className="w-4 h-4 mr-2 text-muted-foreground" />
                       <p>
                         {new Date(
                           inventory.last_restock_date
@@ -215,12 +216,12 @@ export default function ProductDetailPage() {
           )}
 
           {product.description && (
-            <div className="rounded-md border p-4">
+            <div className="p-4 border rounded-md">
               <div className="flex items-center mb-2">
-                <Info className="mr-2 h-4 w-4 text-muted-foreground" />
+                <Info className="w-4 h-4 mr-2 text-muted-foreground" />
                 <h3 className="text-lg font-medium">Description</h3>
               </div>
-              <p className="text-muted-foreground whitespace-pre-line">
+              <p className="whitespace-pre-line text-muted-foreground">
                 {product.description}
               </p>
             </div>

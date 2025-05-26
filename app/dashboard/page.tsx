@@ -217,8 +217,7 @@ function AdminDashboard({ stats }: { stats: any }) {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="flex items-center gap-2 text-2xl font-bold">
-            <DollarSign className="w-6 h-6 text-primary" />
-            Commission Overview
+          ₵ Commission Overview
           </h2>
           <Button asChild variant="outline">
             <Link href="/dashboard/commissions">
@@ -278,8 +277,7 @@ function SalesDashboard({ stats }: { stats: any }) {
               className="flex-col h-auto gap-2 p-4"
             >
               <Link href="/dashboard/commissions">
-                <DollarSign className="w-6 h-6" />
-                <span className="text-sm">My Commissions</span>
+                ₵ <span className="text-sm"> My Commissions</span>
               </Link>
             </Button>
           </div>
@@ -557,7 +555,8 @@ function CommissionStatsCards() {
             Total Commissions
           </CardTitle>
           <div className="p-2 text-white rounded-lg bg-gradient-to-r from-green-500 to-green-600">
-            <DollarSign className="w-4 h-4" />
+            {/* <DollarSign className="w-4 h-4" /> */}
+            ₵
           </div>
         </CardHeader>
         <CardContent>

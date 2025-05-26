@@ -136,7 +136,7 @@ export function ServiceRequestForm({
       if (isEditing && serviceRequest) {
         await updateServiceRequest.mutateAsync({
           id: serviceRequest.id,
-          updates: requestData,
+          ...requestData,
         });
       } else {
         await createServiceRequest.mutateAsync(requestData);
@@ -211,7 +211,7 @@ export function ServiceRequestForm({
                         <SelectContent>
                           {serviceCategories.map((category) => (
                             <SelectItem key={category.id} value={category.id}>
-                              {category.name} - ${category.base_price}
+                              {category.name}
                             </SelectItem>
                           ))}
                         </SelectContent>

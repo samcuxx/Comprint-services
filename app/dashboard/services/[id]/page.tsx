@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
   useServiceRequest,
@@ -53,14 +53,11 @@ import {
   Eye,
   MessageSquare,
   Package,
-  Calendar,
-  DollarSign,
   CreditCard,
   FileText,
 } from "lucide-react";
-import { ServiceAttachments } from "@/components/services/service-attachments";
 import { ServicePaymentDialog } from "@/components/services/service-payment-dialog";
-import { Toast } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 
 const statusConfig = {
   pending: {
@@ -123,8 +120,7 @@ const getPaymentMethodBadge = (method: string) => {
     case "cash":
       return (
         <Badge variant="outline" className="text-green-600 border-green-600">
-          <DollarSign className="w-3 h-3 mr-1" />
-          Cash
+          {/* <DollarSign className="w-3 h-3 mr-1" /> */}₵ Cash
         </Badge>
       );
     case "card":
@@ -155,7 +151,6 @@ const getPaymentMethodBadge = (method: string) => {
 
 export default function ServiceRequestDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const serviceRequestId = params.id as string;
 
   const [isUpdating, setIsUpdating] = useState(false);
@@ -165,6 +160,7 @@ export default function ServiceRequestDetailPage() {
   const [updateNote, setUpdateNote] = useState("");
   const [selectedTechnician, setSelectedTechnician] = useState("");
 
+  const { toast } = useToast();
   const { data: currentUser } = useCurrentUser();
   const {
     data: serviceRequest,
@@ -178,13 +174,8 @@ export default function ServiceRequestDetailPage() {
   const updateServiceRequest = useUpdateServiceRequest();
   const addUpdate = useAddServiceRequestUpdate();
 
-  const isAdmin = currentUser?.role === "admin";
   const isTechnician = currentUser?.role === "technician";
-  const isSales = currentUser?.role === "sales";
-  const canEdit =
-    isAdmin ||
-    (isTechnician &&
-      serviceRequest?.assigned_technician_id === currentUser?.id);
+  const canEdit = !!currentUser;
 
   const handleStatusUpdate = async () => {
     if (!serviceRequest || !newStatus) return;
@@ -193,7 +184,7 @@ export default function ServiceRequestDetailPage() {
     try {
       await updateServiceRequest.mutateAsync({
         id: serviceRequest.id,
-        status: newStatus as any,
+        status: newStatus,
       });
 
       if (updateNote.trim()) {
@@ -209,15 +200,18 @@ export default function ServiceRequestDetailPage() {
         });
       }
 
+      toast({
+        title: "Status updated",
+        variant: "default",
+      });
+
       setUpdateDialogOpen(false);
       setNewStatus("");
       setUpdateNote("");
     } catch (error) {
       console.error("Error updating status:", error);
-      Toast({
+      toast({
         title: "Error updating status",
-        description:
-          error instanceof Error ? error.message : "Unknown error occurred",
         variant: "destructive",
       });
     } finally {
@@ -243,20 +237,25 @@ export default function ServiceRequestDetailPage() {
         service_request_id: serviceRequest.id,
         updated_by: currentUser!.id,
         update_type: "technician_assigned",
-        title: selectedTechnician === "unassigned" 
-          ? "Technician unassigned" 
-          : "Technician assigned",
+        title:
+          selectedTechnician === "unassigned"
+            ? "Technician unassigned"
+            : "Technician assigned",
         description: "Technician assignment updated",
         is_customer_visible: true,
+      });
+
+      toast({
+        title: "Technician assigned successfully",
+        variant: "default",
       });
 
       setAssignDialogOpen(false);
       setSelectedTechnician("");
     } catch (error) {
       console.error("Error assigning technician:", error);
-      Toast({
+      toast({
         title: "Error assigning technician",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
         variant: "destructive",
       });
     } finally {
@@ -278,8 +277,8 @@ export default function ServiceRequestDetailPage() {
         <AlertCircle className="w-12 h-12 text-red-500" />
         <h2 className="text-xl font-semibold">Service request not found</h2>
         <p className="text-muted-foreground">
-          The service request you're looking for doesn't exist or you don't have
-          permission to view it.
+          The service request you&apos;re looking for doesn&apos;t exist or you
+          don&apos;t have permission to view it.
         </p>
         <Link href="/dashboard/services">
           <Button>
@@ -291,7 +290,10 @@ export default function ServiceRequestDetailPage() {
     );
   }
 
-  const StatusIcon = statusConfig[serviceRequest.status]?.icon || Clock;
+  // Use type assertion to ensure TypeScript knows these are valid keys
+  const status = serviceRequest.status as keyof typeof statusConfig;
+  const priority = serviceRequest.priority as keyof typeof priorityConfig;
+  const StatusIcon = statusConfig[status]?.icon || Clock;
 
   return (
     <div className="space-y-6">
@@ -312,21 +314,14 @@ export default function ServiceRequestDetailPage() {
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <Badge className={statusConfig[serviceRequest.status]?.color}>
+          <Badge className={statusConfig[status]?.color}>
             <StatusIcon className="w-3 h-3 mr-1" />
-            {statusConfig[serviceRequest.status]?.label}
+            {statusConfig[status]?.label}
           </Badge>
-          <Badge className={priorityConfig[serviceRequest.priority]?.color}>
-            {priorityConfig[serviceRequest.priority]?.label}
+          <Badge className={priorityConfig[priority]?.color}>
+            {priorityConfig[priority]?.label}
           </Badge>
-          {canEdit && (
-            <Link href={`/dashboard/services/${serviceRequest.id}/edit`}>
-              <Button size="sm">
-                <Edit className="w-4 h-4 mr-2" />
-                Edit
-              </Button>
-            </Link>
-          )}
+      
         </div>
       </div>
 
@@ -360,10 +355,8 @@ export default function ServiceRequestDetailPage() {
                     Priority
                   </Label>
                   <div className="mt-1">
-                    <Badge
-                      className={priorityConfig[serviceRequest.priority]?.color}
-                    >
-                      {priorityConfig[serviceRequest.priority]?.label}
+                    <Badge className={priorityConfig[priority]?.color}>
+                      {priorityConfig[priority]?.label}
                     </Badge>
                   </div>
                 </div>
@@ -537,156 +530,150 @@ export default function ServiceRequestDetailPage() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Quick Actions */}
-          {canEdit && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Dialog
+                open={updateDialogOpen}
+                onOpenChange={setUpdateDialogOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button className="w-full" variant="outline">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Update Status
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Update Service Status</DialogTitle>
+                    <DialogDescription>
+                      Change the status of this service request and optionally
+                      add a note.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label>New Status</Label>
+                      <Select value={newStatus} onValueChange={setNewStatus}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select new status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(statusConfig).map(([key, config]) => (
+                            <SelectItem
+                              key={key}
+                              value={key}
+                              disabled={key === status}
+                            >
+                              {config.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Update Note (Optional)</Label>
+                      <Textarea
+                        placeholder="Add a note about this status change..."
+                        value={updateNote}
+                        onChange={(e) => setUpdateNote(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setUpdateDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleStatusUpdate}
+                      disabled={!newStatus || isUpdating}
+                    >
+                      {isUpdating ? "Updating..." : "Update Status"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+
+              {/* <Link
+                href={`/dashboard/services/${serviceRequest.id}/communication`}
+              >
+                <Button className="w-full" variant="outline">
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Customer Communication
+                </Button>
+              </Link> */}
+
+              <ServicePaymentDialog serviceRequest={serviceRequest} />
+
+              {/* Only show Assign Technician button if user is not a technician */}
+              {!isTechnician && (
                 <Dialog
-                  open={updateDialogOpen}
-                  onOpenChange={setUpdateDialogOpen}
+                  open={assignDialogOpen}
+                  onOpenChange={setAssignDialogOpen}
                 >
                   <DialogTrigger asChild>
                     <Button className="w-full" variant="outline">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Update Status
+                      <User className="w-4 h-4 mr-2" />
+                      Assign Technician
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Update Service Status</DialogTitle>
+                      <DialogTitle>Assign Technician</DialogTitle>
                       <DialogDescription>
-                        Change the status of this service request and optionally
-                        add a note.
+                        Assign or change the technician for this service
+                        request.
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <Label>New Status</Label>
-                        <Select value={newStatus} onValueChange={setNewStatus}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select new status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Object.entries(statusConfig).map(
-                              ([key, config]) => (
-                                <SelectItem
-                                  key={key}
-                                  value={key}
-                                  disabled={key === serviceRequest.status}
-                                >
-                                  {config.label}
-                                </SelectItem>
-                              )
-                            )}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label>Update Note (Optional)</Label>
-                        <Textarea
-                          placeholder="Add a note about this status change..."
-                          value={updateNote}
-                          onChange={(e) => setUpdateNote(e.target.value)}
-                        />
-                      </div>
+                    <div>
+                      <Label>Technician</Label>
+                      <Select
+                        value={selectedTechnician}
+                        onValueChange={setSelectedTechnician}
+                        defaultValue={
+                          serviceRequest.assigned_technician_id || "unassigned"
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select technician" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="unassigned">Unassigned</SelectItem>
+                          {technicians.map((technician) => (
+                            <SelectItem
+                              key={technician.id}
+                              value={technician.id}
+                            >
+                              {technician.full_name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <DialogFooter>
                       <Button
                         variant="outline"
-                        onClick={() => setUpdateDialogOpen(false)}
+                        onClick={() => setAssignDialogOpen(false)}
                       >
                         Cancel
                       </Button>
                       <Button
-                        onClick={handleStatusUpdate}
-                        disabled={!newStatus || isUpdating}
+                        onClick={handleTechnicianAssignment}
+                        disabled={isUpdating}
                       >
-                        {isUpdating ? "Updating..." : "Update Status"}
+                        {isUpdating ? "Assigning..." : "Assign Technician"}
                       </Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
-
-                {/* <Link
-                  href={`/dashboard/services/${serviceRequest.id}/communication`}
-                >
-                  <Button className="w-full" variant="outline">
-                    <MessageSquare className="w-4 h-4 mr-2" />
-                    Customer Communication
-                  </Button>
-                </Link> */}
-
-                <ServicePaymentDialog serviceRequest={serviceRequest} />
-
-                {isAdmin && (
-                  <Dialog
-                    open={assignDialogOpen}
-                    onOpenChange={setAssignDialogOpen}
-                  >
-                    <DialogTrigger asChild>
-                      <Button className="w-full" variant="outline">
-                        <User className="w-4 h-4 mr-2" />
-                        Assign Technician
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Assign Technician</DialogTitle>
-                        <DialogDescription>
-                          Assign or change the technician for this service
-                          request.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div>
-                        <Label>Technician</Label>
-                        <Select
-                          value={selectedTechnician}
-                          onValueChange={setSelectedTechnician}
-                          defaultValue={
-                            serviceRequest.assigned_technician_id ||
-                            "unassigned"
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select technician" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="unassigned">
-                              Unassigned
-                            </SelectItem>
-                            {technicians.map((technician) => (
-                              <SelectItem
-                                key={technician.id}
-                                value={technician.id}
-                              >
-                                {technician.full_name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <DialogFooter>
-                        <Button
-                          variant="outline"
-                          onClick={() => setAssignDialogOpen(false)}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          onClick={handleTechnicianAssignment}
-                          disabled={isUpdating}
-                        >
-                          {isUpdating ? "Assigning..." : "Assign Technician"}
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                )}
-              </CardContent>
-            </Card>
-          )}
+              )}
+            </CardContent>
+          </Card>
 
           {/* Customer Information */}
           {serviceRequest.customer && (
@@ -807,18 +794,14 @@ export default function ServiceRequestDetailPage() {
                 </div>
               )}
 
-              {(isAdmin || isSales) && (
-                <div className="pt-2">
-                  <Link
-                    href={`/dashboard/services/${serviceRequest.id}/payment`}
-                  >
-                    <Button variant="outline" size="sm" className="w-full">
-                      <CreditCard className="w-4 h-4 mr-2" />
-                      Manage Payment
-                    </Button>
-                  </Link>
-                </div>
-              )}
+              <div className="pt-2">
+                <Link href={`/dashboard/services/${serviceRequest.id}/payment`}>
+                  <Button variant="outline" size="sm" className="w-full">
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Manage Payment
+                  </Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
         </div>

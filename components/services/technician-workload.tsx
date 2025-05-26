@@ -120,7 +120,7 @@ export function TechnicianWorkload({
     try {
       await updateServiceRequest.mutateAsync({
         id: selectedRequest,
-        updates: { assigned_technician_id: newTechnician },
+        assigned_technician_id: newTechnician,
       });
       setAssignDialogOpen(false);
       setSelectedRequest("");

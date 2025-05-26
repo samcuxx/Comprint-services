@@ -75,9 +75,8 @@ export default function ServicePaymentPage() {
   const addUpdate = useAddServiceRequestUpdate();
   const { toast } = useToast();
 
-  const isAdmin = currentUser?.role === "admin";
-  const isSales = currentUser?.role === "sales";
-  const canManagePayment = isAdmin || isSales;
+  // Allow all users to manage payments
+  const canManagePayment = !!currentUser;
 
   const form = useForm<PaymentFormData>({
     resolver: zodResolver(paymentSchema),
@@ -112,25 +111,23 @@ export default function ServicePaymentPage() {
 
       await updateServiceRequest.mutateAsync({
         id: serviceRequest.id,
-        updates: {
-          final_cost: data.final_cost,
-          payment_method: data.payment_method,
-          payment_status: data.payment_status,
-          payment_notes: data.payment_notes,
-          // Add completion date if status is paid and service is completed
-          completed_date:
-            data.payment_status === "paid" &&
-            serviceRequest.status === "completed"
-              ? new Date().toISOString()
-              : serviceRequest.completed_date,
-        },
+        final_cost: data.final_cost,
+        payment_method: data.payment_method,
+        payment_status: data.payment_status,
+        payment_notes: data.payment_notes,
+        // Add completion date if status is paid and service is completed
+        completed_date:
+          data.payment_status === "paid" &&
+          serviceRequest.status === "completed"
+            ? new Date().toISOString()
+            : serviceRequest.completed_date,
       });
 
       // Add update log
       await addUpdate.mutateAsync({
         service_request_id: serviceRequest.id,
         updated_by: currentUser.id,
-        update_type: "cost_update",
+        update_type: "payment_received",
         title: `Payment status updated to ${data.payment_status}`,
         description: `Payment method: ${
           data.payment_method
@@ -165,29 +162,24 @@ export default function ServicePaymentPage() {
     switch (status) {
       case "paid":
         return (
-          <Badge className="bg-green-100 text-green-800">
-            <CheckCircle className="mr-1 h-3 w-3" />
+          <Badge className="text-green-800 bg-green-100">
+            <CheckCircle className="w-3 h-3 mr-1" />
             Paid
           </Badge>
         );
       case "pending":
         return (
-          <Badge className="bg-yellow-100 text-yellow-800">
-            <Clock className="mr-1 h-3 w-3" />
+          <Badge className="text-yellow-800 bg-yellow-100">
+            <Clock className="w-3 h-3 mr-1" />
             Pending
           </Badge>
         );
       case "partial":
-        return (
-          <Badge className="bg-blue-100 text-blue-800">
-            <DollarSign className="mr-1 h-3 w-3" />
-            Partial
-          </Badge>
-        );
+        return <Badge className="text-blue-800 bg-blue-100">₵ Partial</Badge>;
       case "cancelled":
         return (
-          <Badge className="bg-red-100 text-red-800">
-            <AlertCircle className="mr-1 h-3 w-3" />
+          <Badge className="text-red-800 bg-red-100">
+            <AlertCircle className="w-3 h-3 mr-1" />
             Cancelled
           </Badge>
         );
@@ -201,14 +193,13 @@ export default function ServicePaymentPage() {
       case "cash":
         return (
           <Badge variant="outline" className="text-green-600 border-green-600">
-            <DollarSign className="mr-1 h-3 w-3" />
-            Cash
+            ₵ Cash
           </Badge>
         );
       case "card":
         return (
           <Badge variant="outline" className="text-blue-600 border-blue-600">
-            <CreditCard className="mr-1 h-3 w-3" />
+            <CreditCard className="w-3 h-3 mr-1" />
             Card
           </Badge>
         );
@@ -218,14 +209,14 @@ export default function ServicePaymentPage() {
             variant="outline"
             className="text-purple-600 border-purple-600"
           >
-            <Package className="mr-1 h-3 w-3" />
+            <Package className="w-3 h-3 mr-1" />
             Transfer
           </Badge>
         );
       case "check":
         return (
           <Badge variant="outline" className="text-amber-600 border-amber-600">
-            <FileText className="mr-1 h-3 w-3" />
+            <FileText className="w-3 h-3 mr-1" />
             Check
           </Badge>
         );
@@ -245,15 +236,15 @@ export default function ServicePaymentPage() {
   if (error || !serviceRequest) {
     return (
       <div className="flex h-[50vh] flex-col items-center justify-center space-y-4">
-        <AlertCircle className="h-12 w-12 text-red-500" />
+        <AlertCircle className="w-12 h-12 text-red-500" />
         <h2 className="text-xl font-semibold">Service request not found</h2>
         <p className="text-muted-foreground">
-          The service request you're looking for doesn't exist or you don't have
-          permission to view it.
+          The service request you&apos;re looking for doesn&apos;t exist or you
+          don&apos;t have permission to view it.
         </p>
         <Link href="/dashboard/services">
           <Button>
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Service Requests
           </Button>
         </Link>
@@ -264,14 +255,15 @@ export default function ServicePaymentPage() {
   if (!canManagePayment) {
     return (
       <div className="flex h-[50vh] flex-col items-center justify-center space-y-4">
-        <AlertCircle className="h-12 w-12 text-red-500" />
+        <AlertCircle className="w-12 h-12 text-red-500" />
         <h2 className="text-xl font-semibold">Access Denied</h2>
         <p className="text-muted-foreground">
-          You don't have permission to manage payments for this service request.
+          You don&apos;t have permission to manage payments for this service
+          request.
         </p>
         <Link href={`/dashboard/services/${serviceRequest.id}`}>
           <Button>
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Service Request
           </Button>
         </Link>
@@ -286,7 +278,7 @@ export default function ServicePaymentPage() {
         <div className="flex items-center space-x-4">
           <Link href={`/dashboard/services/${serviceRequest.id}`}>
             <Button variant="ghost" size="sm">
-              <ArrowLeft className="mr-2 h-4 w-4" />
+              <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
           </Link>
@@ -307,7 +299,7 @@ export default function ServicePaymentPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Receipt className="h-5 w-5" />
+                <Receipt className="w-5 h-5" />
                 <span>Payment Information</span>
               </CardTitle>
             </CardHeader>
@@ -360,32 +352,8 @@ export default function ServicePaymentPage() {
                             <SelectContent>
                               <SelectItem value="cash">
                                 <div className="flex items-center space-x-2">
-                                  <DollarSign className="h-4 w-4" />
-                                  <span>Cash</span>
-                                </div>
-                              </SelectItem>
-                              <SelectItem value="card">
-                                <div className="flex items-center space-x-2">
-                                  <CreditCard className="h-4 w-4" />
-                                  <span>Card</span>
-                                </div>
-                              </SelectItem>
-                              <SelectItem value="transfer">
-                                <div className="flex items-center space-x-2">
-                                  <Package className="h-4 w-4" />
-                                  <span>Bank Transfer</span>
-                                </div>
-                              </SelectItem>
-                              <SelectItem value="check">
-                                <div className="flex items-center space-x-2">
-                                  <FileText className="h-4 w-4" />
-                                  <span>Check</span>
-                                </div>
-                              </SelectItem>
-                              <SelectItem value="other">
-                                <div className="flex items-center space-x-2">
-                                  <Receipt className="h-4 w-4" />
-                                  <span>Other</span>
+                                  {/* <DollarSign className="w-4 h-4" /> */}
+                                  <span>₵ Cash</span>
                                 </div>
                               </SelectItem>
                             </SelectContent>
@@ -414,25 +382,25 @@ export default function ServicePaymentPage() {
                             <SelectContent>
                               <SelectItem value="pending">
                                 <div className="flex items-center space-x-2">
-                                  <Clock className="h-4 w-4 text-yellow-600" />
+                                  <Clock className="w-4 h-4 text-yellow-600" />
                                   <span>Pending</span>
                                 </div>
                               </SelectItem>
                               <SelectItem value="paid">
                                 <div className="flex items-center space-x-2">
-                                  <CheckCircle className="h-4 w-4 text-green-600" />
+                                  <CheckCircle className="w-4 h-4 text-green-600" />
                                   <span>Paid</span>
                                 </div>
                               </SelectItem>
                               <SelectItem value="partial">
                                 <div className="flex items-center space-x-2">
-                                  <DollarSign className="h-4 w-4 text-blue-600" />
+                                  <DollarSign className="w-4 h-4 text-blue-600" />
                                   <span>Partial</span>
                                 </div>
                               </SelectItem>
                               <SelectItem value="cancelled">
                                 <div className="flex items-center space-x-2">
-                                  <AlertCircle className="h-4 w-4 text-red-600" />
+                                  <AlertCircle className="w-4 h-4 text-red-600" />
                                   <span>Cancelled</span>
                                 </div>
                               </SelectItem>
@@ -476,7 +444,7 @@ export default function ServicePaymentPage() {
                     </Link>
                     <Button type="submit" disabled={isSubmitting}>
                       {isSubmitting && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       )}
                       Update Payment
                     </Button>

@@ -123,29 +123,30 @@ export default function SaleDetailsPage() {
             onClick={() => router.back()}
             className="mr-2"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" /> Back
+            <ArrowLeft className="w-4 h-4 mr-2" /> Back
           </Button>
           <h1 className="text-2xl font-bold">Sale Details</h1>
         </div>
         <div className="flex items-center gap-2">
-          <Button
+         {/* NOTE: This is not working */}
+          {/* <Button
             variant="outline"
             size="sm"
             onClick={() => window.print()}
             className="hidden md:flex"
           >
-            <Printer className="h-4 w-4 mr-2" /> Print Invoice
-          </Button>
+            <Printer className="w-4 h-4 mr-2" /> Print Invoice
+          </Button> */}
         </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
         {/* Invoice Information */}
-        <div className="md:col-span-2 grid gap-6">
-          <div className="rounded-lg border bg-card p-6 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="grid gap-6 md:col-span-2">
+          <div className="p-6 border rounded-lg shadow-sm bg-card">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <div className="text-sm text-muted-foreground mb-1">
+                <div className="mb-1 text-sm text-muted-foreground">
                   Invoice Number
                 </div>
                 <h2 className="text-2xl font-semibold">
@@ -153,7 +154,7 @@ export default function SaleDetailsPage() {
                 </h2>
               </div>
               <div className="flex flex-col items-end">
-                <div className="text-sm text-muted-foreground mb-1">Status</div>
+                <div className="mb-1 text-sm text-muted-foreground">Status</div>
                 {getStatusBadge(sale.payment_status)}
               </div>
             </div>
@@ -162,18 +163,18 @@ export default function SaleDetailsPage() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <div className="text-sm text-muted-foreground mb-1">Date</div>
+                <div className="mb-1 text-sm text-muted-foreground">Date</div>
                 <div className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
+                  <Calendar className="w-4 h-4 mr-2 text-muted-foreground" />
                   <span>{formattedDate}</span>
                 </div>
               </div>
               <div>
-                <div className="text-sm text-muted-foreground mb-1">
+                <div className="mb-1 text-sm text-muted-foreground">
                   Payment Method
                 </div>
                 <div className="flex items-center">
-                  <CreditCard className="h-4 w-4 mr-2 text-muted-foreground" />
+                  <CreditCard className="w-4 h-4 mr-2 text-muted-foreground" />
                   <span>{getPaymentMethodBadge(sale.payment_method)}</span>
                 </div>
               </div>
@@ -181,12 +182,12 @@ export default function SaleDetailsPage() {
           </div>
 
           {/* Customer Info */}
-          <div className="rounded-lg border bg-card p-6 shadow-sm">
-            <h3 className="text-lg font-medium mb-4">Customer Information</h3>
+          <div className="p-6 border rounded-lg shadow-sm bg-card">
+            <h3 className="mb-4 text-lg font-medium">Customer Information</h3>
             {sale.customer ? (
               <div className="flex items-start space-x-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                  <User className="h-6 w-6 text-primary" />
+                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
+                  <User className="w-6 h-6 text-primary" />
                 </div>
                 <div>
                   <h4 className="text-lg font-semibold">
@@ -216,18 +217,18 @@ export default function SaleDetailsPage() {
               </div>
             ) : (
               <div className="flex items-center space-x-2 text-muted-foreground">
-                <User className="h-5 w-5" />
+                <User className="w-5 h-5" />
                 <span>Walk-in Customer</span>
               </div>
             )}
           </div>
 
           {/* Sale Items */}
-          <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="p-6 border rounded-lg shadow-sm bg-card">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium">Items</h3>
               <Badge variant="outline">
-                <ShoppingCart className="h-3 w-3 mr-1" />
+                <ShoppingCart className="w-3 h-3 mr-1" />
                 {sale.items?.length || 0} items
               </Badge>
             </div>
@@ -235,31 +236,31 @@ export default function SaleDetailsPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b text-sm">
-                    <th className="py-3 px-2 text-left font-medium">Product</th>
-                    <th className="py-3 px-2 text-right font-medium">Price</th>
-                    <th className="py-3 px-2 text-right font-medium">Qty</th>
-                    <th className="py-3 px-2 text-right font-medium">
+                  <tr className="text-sm border-b">
+                    <th className="px-2 py-3 font-medium text-left">Product</th>
+                    <th className="px-2 py-3 font-medium text-right">Price</th>
+                    <th className="px-2 py-3 font-medium text-right">Qty</th>
+                    <th className="px-2 py-3 font-medium text-right">
                       Discount
                     </th>
-                    <th className="py-3 px-2 text-right font-medium">Total</th>
+                    <th className="px-2 py-3 font-medium text-right">Total</th>
                   </tr>
                 </thead>
                 <tbody>
                   {sale.items && sale.items.length > 0 ? (
                     sale.items.map((item) => (
                       <tr key={item.id} className="border-b">
-                        <td className="py-3 px-2">
+                        <td className="px-2 py-3">
                           <div className="flex items-center">
-                            <div className="h-9 w-9 flex-shrink-0 mr-3 rounded bg-muted flex items-center justify-center">
+                            <div className="flex items-center justify-center flex-shrink-0 mr-3 rounded h-9 w-9 bg-muted">
                               {item.product?.image_url ? (
                                 <img
                                   src={item.product.image_url}
                                   alt={item.product.name}
-                                  className="h-full w-full object-cover rounded"
+                                  className="object-cover w-full h-full rounded"
                                 />
                               ) : (
-                                <Package className="h-4 w-4 text-muted-foreground" />
+                                <Package className="w-4 h-4 text-muted-foreground" />
                               )}
                             </div>
                             <div>
@@ -272,16 +273,16 @@ export default function SaleDetailsPage() {
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 px-2 text-right">
+                        <td className="px-2 py-3 text-right">
                           {formatCurrency(item.unit_price)}
                         </td>
-                        <td className="py-3 px-2 text-right">
+                        <td className="px-2 py-3 text-right">
                           {item.quantity}
                         </td>
-                        <td className="py-3 px-2 text-right">
+                        <td className="px-2 py-3 text-right">
                           {item.discount_percent}%
                         </td>
-                        <td className="py-3 px-2 text-right font-medium">
+                        <td className="px-2 py-3 font-medium text-right">
                           {formatCurrency(item.total_price)}
                         </td>
                       </tr>
@@ -304,8 +305,8 @@ export default function SaleDetailsPage() {
 
         {/* Sale Summary */}
         <div className="space-y-6">
-          <div className="rounded-lg border bg-card p-6 shadow-sm sticky top-4">
-            <h3 className="text-lg font-medium mb-4">Sale Summary</h3>
+          <div className="sticky p-6 border rounded-lg shadow-sm bg-card top-4">
+            <h3 className="mb-4 text-lg font-medium">Sale Summary</h3>
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal</span>
@@ -320,7 +321,7 @@ export default function SaleDetailsPage() {
                 <span>{formatCurrency(sale.discount_amount || 0)}</span>
               </div>
               <Separator className="my-2" />
-              <div className="flex justify-between font-bold text-lg">
+              <div className="flex justify-between text-lg font-bold">
                 <span>Total</span>
                 <span>{formatCurrency(sale.total_amount)}</span>
               </div>
@@ -329,11 +330,11 @@ export default function SaleDetailsPage() {
 
           {/* Sales Person Info */}
           {sale.sales_person && (
-            <div className="rounded-lg border bg-card p-6 shadow-sm">
-              <h3 className="text-lg font-medium mb-4">Sales Person</h3>
+            <div className="p-6 border rounded-lg shadow-sm bg-card">
+              <h3 className="mb-4 text-lg font-medium">Sales Person</h3>
               <div className="flex items-center space-x-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
-                  <User className="h-4 w-4 text-primary" />
+                <div className="flex items-center justify-center rounded-full h-9 w-9 bg-primary/10">
+                  <User className="w-4 h-4 text-primary" />
                 </div>
                 <div>
                   <div className="font-medium">
@@ -349,9 +350,9 @@ export default function SaleDetailsPage() {
 
           {/* Notes */}
           {sale.notes && (
-            <div className="rounded-lg border bg-card p-6 shadow-sm">
-              <h3 className="text-lg font-medium mb-2">Notes</h3>
-              <p className="text-muted-foreground whitespace-pre-line">
+            <div className="p-6 border rounded-lg shadow-sm bg-card">
+              <h3 className="mb-2 text-lg font-medium">Notes</h3>
+              <p className="whitespace-pre-line text-muted-foreground">
                 {sale.notes}
               </p>
             </div>
@@ -360,14 +361,14 @@ export default function SaleDetailsPage() {
           {/* Commission Info */}
           {(isAdmin ||
             (isSales && sale.sales_person.id === currentUser?.id)) && (
-            <div className="mt-4 pt-4 border-t">
-              <h3 className="text-lg font-medium mb-2">
+            <div className="pt-4 mt-4 border-t">
+              <h3 className="mb-2 text-lg font-medium">
                 Commission Information
               </h3>
               <div className="grid gap-2">
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center text-muted-foreground">
-                    <CircleDollarSign className="h-4 w-4 mr-2" />
+                    <CircleDollarSign className="w-4 h-4 mr-2" />
                     Total Commission
                   </div>
                   <div className="font-medium">
@@ -385,7 +386,7 @@ export default function SaleDetailsPage() {
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center text-muted-foreground">
-                    <Percent className="h-4 w-4 mr-2" />
+                    <Percent className="w-4 h-4 mr-2" />
                     Commission Rates
                   </div>
                   <div>

@@ -93,19 +93,17 @@ export function ServicePaymentDialog({
       // Update the service request
       await updateServiceRequest.mutateAsync({
         id: serviceRequest.id,
-        updates: {
-          final_cost: data.final_cost,
-          payment_method: data.payment_method,
-          payment_status: data.payment_status,
-          payment_notes: data.payment_notes,
-        },
+        final_cost: data.final_cost,
+        payment_method: data.payment_method,
+        payment_status: data.payment_status,
+        payment_notes: data.payment_notes,
       });
 
       // Add update log
       await addUpdate.mutateAsync({
         service_request_id: serviceRequest.id,
         updated_by: currentUser.id,
-        update_type: "cost_update",
+        update_type: "payment_received",
         title: `Payment status updated to ${data.payment_status}`,
         description: `Payment method: ${
           data.payment_method
@@ -155,11 +153,11 @@ export function ServicePaymentDialog({
   const getPaymentMethodIcon = (method: string) => {
     switch (method) {
       case "card":
-        return <CreditCard className="h-4 w-4" />;
+        return <CreditCard className="w-4 h-4" />;
       case "cash":
-        return <DollarSign className="h-4 w-4" />;
+        return <DollarSign className="w-4 h-4" />;
       default:
-        return <Receipt className="h-4 w-4" />;
+        return <Receipt className="w-4 h-4" />;
     }
   };
 
@@ -168,7 +166,7 @@ export function ServicePaymentDialog({
       <DialogTrigger asChild>
         {trigger || (
           <Button variant="outline" className="w-full">
-            <CreditCard className="mr-2 h-4 w-4" />
+            <CreditCard className="w-4 h-4 mr-2" />
             Manage Payment
           </Button>
         )}
@@ -176,7 +174,7 @@ export function ServicePaymentDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
-            <Receipt className="h-5 w-5" />
+            <Receipt className="w-5 h-5" />
             <span>Service Payment</span>
           </DialogTitle>
           <DialogDescription>
@@ -188,7 +186,7 @@ export function ServicePaymentDialog({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {/* Current Payment Status */}
-            <div className="p-3 bg-muted rounded-lg">
+            <div className="p-3 rounded-lg bg-muted">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium">Current Status</span>
                 <span
@@ -250,32 +248,8 @@ export function ServicePaymentDialog({
                     <SelectContent>
                       <SelectItem value="cash">
                         <div className="flex items-center space-x-2">
-                          <DollarSign className="h-4 w-4" />
-                          <span>Cash</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="card">
-                        <div className="flex items-center space-x-2">
-                          <CreditCard className="h-4 w-4" />
-                          <span>Card</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="transfer">
-                        <div className="flex items-center space-x-2">
-                          <Receipt className="h-4 w-4" />
-                          <span>Bank Transfer</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="check">
-                        <div className="flex items-center space-x-2">
-                          <Receipt className="h-4 w-4" />
-                          <span>Check</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="other">
-                        <div className="flex items-center space-x-2">
-                          <Receipt className="h-4 w-4" />
-                          <span>Other</span>
+                          {/* <DollarSign className="w-4 h-4" /> */}
+                          <span>₵ Cash</span>
                         </div>
                       </SelectItem>
                     </SelectContent>
@@ -301,25 +275,25 @@ export function ServicePaymentDialog({
                     <SelectContent>
                       <SelectItem value="pending">
                         <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                          <div className="w-2 h-2 bg-yellow-500 rounded-full" />
                           <span>Pending</span>
                         </div>
                       </SelectItem>
                       <SelectItem value="paid">
                         <div className="flex items-center space-x-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="w-4 h-4 text-green-600" />
                           <span>Paid</span>
                         </div>
                       </SelectItem>
                       <SelectItem value="partial">
                         <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 rounded-full bg-blue-500" />
+                          <div className="w-2 h-2 bg-blue-500 rounded-full" />
                           <span>Partial</span>
                         </div>
                       </SelectItem>
                       <SelectItem value="cancelled">
                         <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 rounded-full bg-red-500" />
+                          <div className="w-2 h-2 bg-red-500 rounded-full" />
                           <span>Cancelled</span>
                         </div>
                       </SelectItem>
@@ -360,7 +334,7 @@ export function ServicePaymentDialog({
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 )}
                 Update Payment
               </Button>
