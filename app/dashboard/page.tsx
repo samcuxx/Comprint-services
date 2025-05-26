@@ -74,8 +74,8 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="text-center space-y-4">
-          <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto" />
+        <div className="space-y-4 text-center">
+          <Loader2 className="w-12 h-12 mx-auto text-primary animate-spin" />
           <p className="text-muted-foreground">Loading your dashboard...</p>
         </div>
       </div>
@@ -85,14 +85,14 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-xl p-6 border">
+      <div className="p-6 border bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-xl">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
               {getGreeting()}, {(user as any).full_name || user.email}!{" "}
               {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
             </h1>
-            <p className="text-muted-foreground flex items-center gap-2">
+            <p className="flex items-center gap-2 text-muted-foreground">
               <Badge variant="secondary" className="bg-primary/10 text-primary">
                 {getRoleTitle()}
               </Badge>
@@ -108,7 +108,7 @@ export default function DashboardPage() {
               </span>
             </p>
           </div>
-          <div className="hidden md:flex items-center space-x-2">
+          <div className="items-center hidden space-x-2 md:flex">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <span className="text-sm text-muted-foreground">System Online</span>
           </div>
@@ -136,8 +136,8 @@ function AdminDashboard({ stats }: { stats: any }) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button asChild className="h-auto p-4 flex-col gap-2">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            <Button asChild className="flex-col h-auto gap-2 p-4">
               <Link href="/dashboard/employees">
                 <Users className="w-6 h-6" />
                 <span className="text-sm">Add Employee</span>
@@ -146,7 +146,7 @@ function AdminDashboard({ stats }: { stats: any }) {
             <Button
               asChild
               variant="outline"
-              className="h-auto p-4 flex-col gap-2"
+              className="flex-col h-auto gap-2 p-4"
             >
               <Link href="/dashboard/products">
                 <Package className="w-6 h-6" />
@@ -156,7 +156,7 @@ function AdminDashboard({ stats }: { stats: any }) {
             <Button
               asChild
               variant="outline"
-              className="h-auto p-4 flex-col gap-2"
+              className="flex-col h-auto gap-2 p-4"
             >
               <Link href="/dashboard/sales/new">
                 <ShoppingCart className="w-6 h-6" />
@@ -166,7 +166,7 @@ function AdminDashboard({ stats }: { stats: any }) {
             <Button
               asChild
               variant="outline"
-              className="h-auto p-4 flex-col gap-2"
+              className="flex-col h-auto gap-2 p-4"
             >
               <Link href="/dashboard/reports">
                 <BarChart3 className="w-6 h-6" />
@@ -178,7 +178,7 @@ function AdminDashboard({ stats }: { stats: any }) {
       </Card>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           title="Total Employees"
           value={stats?.totalEmployees || 0}
@@ -216,7 +216,7 @@ function AdminDashboard({ stats }: { stats: any }) {
       {/* Commission Overview */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold flex items-center gap-2">
+          <h2 className="flex items-center gap-2 text-2xl font-bold">
             <DollarSign className="w-6 h-6 text-primary" />
             Commission Overview
           </h2>
@@ -232,7 +232,7 @@ function AdminDashboard({ stats }: { stats: any }) {
       </div>
 
       {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <RecentActivityCard />
         <SystemStatusCard />
       </div>
@@ -255,8 +255,8 @@ function SalesDashboard({ stats }: { stats: any }) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <Button asChild className="h-auto p-4 flex-col gap-2">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+            <Button asChild className="flex-col h-auto gap-2 p-4">
               <Link href="/dashboard/sales/new">
                 <Plus className="w-6 h-6" />
                 <span className="text-sm">New Sale</span>
@@ -265,7 +265,7 @@ function SalesDashboard({ stats }: { stats: any }) {
             <Button
               asChild
               variant="outline"
-              className="h-auto p-4 flex-col gap-2"
+              className="flex-col h-auto gap-2 p-4"
             >
               <Link href="/dashboard/customers">
                 <User className="w-6 h-6" />
@@ -275,7 +275,7 @@ function SalesDashboard({ stats }: { stats: any }) {
             <Button
               asChild
               variant="outline"
-              className="h-auto p-4 flex-col gap-2"
+              className="flex-col h-auto gap-2 p-4"
             >
               <Link href="/dashboard/commissions">
                 <DollarSign className="w-6 h-6" />
@@ -287,7 +287,7 @@ function SalesDashboard({ stats }: { stats: any }) {
       </Card>
 
       {/* Sales Performance */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           title="Today's Sales"
           value={salesData?.dailySales || 0}
@@ -298,7 +298,7 @@ function SalesDashboard({ stats }: { stats: any }) {
         />
         <Card className="relative overflow-hidden">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-sm font-medium">
               <Target className="w-4 h-4 text-primary" />
               Monthly Goal
             </CardTitle>
@@ -333,9 +333,9 @@ function SalesDashboard({ stats }: { stats: any }) {
       </div>
 
       {/* Sales Insights */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SalesPerformanceCard />
-        <RecentSalesCard />
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* <SalesPerformanceCard />
+        <RecentSalesCard /> */}
       </div>
     </div>
   );
@@ -356,8 +356,8 @@ function TechnicianDashboard({ stats }: { stats: any }) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <Button asChild className="h-auto p-4 flex-col gap-2">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+            <Button asChild className="flex-col h-auto gap-2 p-4">
               <Link href="/dashboard/services/new">
                 <Plus className="w-6 h-6" />
                 <span className="text-sm">New Service</span>
@@ -366,7 +366,7 @@ function TechnicianDashboard({ stats }: { stats: any }) {
             <Button
               asChild
               variant="outline"
-              className="h-auto p-4 flex-col gap-2"
+              className="flex-col h-auto gap-2 p-4"
             >
               <Link href="/dashboard/services">
                 <Wrench className="w-6 h-6" />
@@ -376,7 +376,7 @@ function TechnicianDashboard({ stats }: { stats: any }) {
             <Button
               asChild
               variant="outline"
-              className="h-auto p-4 flex-col gap-2"
+              className="flex-col h-auto gap-2 p-4"
             >
               <Link href="/dashboard/services/tracking">
                 <BarChart3 className="w-6 h-6" />
@@ -388,7 +388,7 @@ function TechnicianDashboard({ stats }: { stats: any }) {
       </Card>
 
       {/* Service Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           title="Active Requests"
           value={techData?.activeServiceRequests || 0}
@@ -415,7 +415,7 @@ function TechnicianDashboard({ stats }: { stats: any }) {
         />
         <Card className="relative overflow-hidden">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-sm font-medium">
               <Star className="w-4 h-4 text-yellow-500" />
               Customer Rating
             </CardTitle>
@@ -444,7 +444,7 @@ function TechnicianDashboard({ stats }: { stats: any }) {
       </div>
 
       {/* Service Insights */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <ServiceStatusCard />
         <RecentServicesCard />
       </div>
@@ -470,9 +470,9 @@ function MetricCard({
   isAlert?: boolean;
 }) {
   return (
-    <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+    <Card className="relative overflow-hidden transition-all duration-300 group hover:shadow-lg">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium flex items-center justify-between">
+        <CardTitle className="flex items-center justify-between text-sm font-medium">
           <span>{title}</span>
           <div
             className={`p-2 rounded-lg bg-gradient-to-r ${gradient} text-white`}
@@ -510,7 +510,7 @@ function MetricCard({
               asChild
               size="sm"
               variant="ghost"
-              className="opacity-0 group-hover:opacity-100 transition-opacity"
+              className="transition-opacity opacity-0 group-hover:opacity-100"
             >
               <Link href={href}>
                 <ArrowRight className="w-4 h-4" />
@@ -535,8 +535,8 @@ function CommissionStatsCards() {
 
   if (isLoading) {
     return (
-      <div className="col-span-4 flex h-40 items-center justify-center">
-        <Loader2 className="h-8 w-8 text-gray-500 animate-spin" />
+      <div className="flex items-center justify-center h-40 col-span-4">
+        <Loader2 className="w-8 h-8 text-gray-500 animate-spin" />
       </div>
     );
   }
@@ -552,12 +552,12 @@ function CommissionStatsCards() {
   return (
     <>
       <Card className="relative overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
           <CardTitle className="text-sm font-medium">
             Total Commissions
           </CardTitle>
-          <div className="p-2 rounded-lg bg-gradient-to-r from-green-500 to-green-600 text-white">
-            <DollarSign className="h-4 w-4" />
+          <div className="p-2 text-white rounded-lg bg-gradient-to-r from-green-500 to-green-600">
+            <DollarSign className="w-4 h-4" />
           </div>
         </CardHeader>
         <CardContent>
@@ -568,12 +568,12 @@ function CommissionStatsCards() {
       </Card>
 
       <Card className="relative overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
           <CardTitle className="text-sm font-medium">
             Paid Commissions
           </CardTitle>
-          <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-            <CheckCircle className="h-4 w-4" />
+          <div className="p-2 text-white rounded-lg bg-gradient-to-r from-blue-500 to-blue-600">
+            <CheckCircle className="w-4 h-4" />
           </div>
         </CardHeader>
         <CardContent>
@@ -584,12 +584,12 @@ function CommissionStatsCards() {
       </Card>
 
       <Card className="relative overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
           <CardTitle className="text-sm font-medium">
             Pending Commissions
           </CardTitle>
-          <div className="p-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-            <AlertCircle className="h-4 w-4" />
+          <div className="p-2 text-white rounded-lg bg-gradient-to-r from-orange-500 to-orange-600">
+            <AlertCircle className="w-4 h-4" />
           </div>
         </CardHeader>
         <CardContent>
@@ -600,10 +600,10 @@ function CommissionStatsCards() {
       </Card>
 
       <Card className="relative overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
           <CardTitle className="text-sm font-medium">Payment Rate</CardTitle>
-          <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-            <Percent className="h-4 w-4" />
+          <div className="p-2 text-white rounded-lg bg-gradient-to-r from-purple-500 to-purple-600">
+            <Percent className="w-4 h-4" />
           </div>
         </CardHeader>
         <CardContent>
@@ -644,7 +644,7 @@ function CommissionStatsCards() {
                   key={performer.sales_person.id}
                   className="flex items-center gap-4 p-3 rounded-lg bg-muted/50"
                 >
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-bold">
+                  <div className="flex items-center justify-center w-8 h-8 font-bold rounded-full bg-primary/10 text-primary">
                     {index + 1}
                   </div>
                   <div className="flex-1">
@@ -703,9 +703,9 @@ function RecentActivityCard() {
           ].map((activity, index) => (
             <div
               key={index}
-              className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
+              className="flex items-center gap-3 p-2 transition-colors rounded-lg hover:bg-muted/50"
             >
-              <div className="w-2 h-2 bg-primary rounded-full"></div>
+              <div className="w-2 h-2 rounded-full bg-primary"></div>
               <div className="flex-1">
                 <p className="text-sm font-medium">{activity.action}</p>
                 <p className="text-xs text-muted-foreground">{activity.time}</p>
@@ -746,11 +746,11 @@ function SystemStatusCard() {
               <div className="text-right">
                 <Badge
                   variant="secondary"
-                  className="bg-green-100 text-green-800"
+                  className="text-green-800 bg-green-100"
                 >
                   {service.status}
                 </Badge>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="mt-1 text-xs text-muted-foreground">
                   {service.uptime}
                 </p>
               </div>
@@ -819,7 +819,7 @@ function RecentSalesCard() {
           ].map((sale, index) => (
             <div
               key={index}
-              className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
+              className="flex items-center justify-between p-2 transition-colors rounded-lg hover:bg-muted/50"
             >
               <div>
                 <p className="text-sm font-medium">{sale.customer}</p>
@@ -909,7 +909,7 @@ function RecentServicesCard() {
           ].map((service, index) => (
             <div
               key={index}
-              className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
+              className="flex items-center justify-between p-2 transition-colors rounded-lg hover:bg-muted/50"
             >
               <div>
                 <p className="text-sm font-medium">{service.service}</p>

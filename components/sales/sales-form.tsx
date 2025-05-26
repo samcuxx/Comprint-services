@@ -309,13 +309,13 @@ export function SalesForm() {
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold">Products</h2>
                 <Badge variant="outline" className="flex items-center gap-1">
-                  <ShoppingCart className="h-3 w-3" />
+                  <ShoppingCart className="w-3 h-3" />
                   <span>{cartItems.length} items</span>
                 </Badge>
               </div>
 
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Search className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
                 <Input
                   placeholder="Search products by name or SKU"
                   value={productSearchQuery}
@@ -345,22 +345,22 @@ export function SalesForm() {
                       return (
                         <div
                           key={product.id}
-                          className="p-3 hover:bg-muted/50 flex items-center justify-between"
+                          className="flex items-center justify-between p-3 hover:bg-muted/50"
                         >
                           <div className="flex items-center space-x-3">
-                            <div className="flex-shrink-0 h-10 w-10 bg-muted rounded-md flex items-center justify-center overflow-hidden">
+                            <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 overflow-hidden rounded-md bg-muted">
                               {product.image_url ? (
                                 <img
                                   src={product.image_url}
                                   alt={product.name}
-                                  className="h-full w-full object-cover"
+                                  className="object-cover w-full h-full"
                                 />
                               ) : (
-                                <Package className="h-5 w-5 text-muted-foreground" />
+                                <Package className="w-5 h-5 text-muted-foreground" />
                               )}
                             </div>
                             <div>
-                              <h4 className="font-medium text-sm">
+                              <h4 className="text-sm font-medium">
                                 {product.name}
                               </h4>
                               <div className="flex items-center space-x-2 text-xs">
@@ -369,13 +369,13 @@ export function SalesForm() {
                                 </span>
                                 <Badge
                                   variant="outline"
-                                  className="text-xs px-1 py-0 h-4"
+                                  className="h-4 px-1 py-0 text-xs"
                                 >
                                   {quantity} in stock
                                 </Badge>
                                 <Badge
                                   variant="secondary"
-                                  className="text-xs px-1 py-0 h-4"
+                                  className="h-4 px-1 py-0 text-xs"
                                 >
                                   {formatCurrency(product.selling_price)}
                                 </Badge>
@@ -403,7 +403,7 @@ export function SalesForm() {
               <h2 className="text-lg font-semibold">Customer (Optional)</h2>
 
               <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Search className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
                 <Input
                   placeholder="Search customers by name, email or phone"
                   value={customerSearchQuery}
@@ -437,7 +437,7 @@ export function SalesForm() {
                             customers.map((customer) => (
                               <SelectItem key={customer.id} value={customer.id}>
                                 <div className="flex items-center">
-                                  <User className="mr-2 h-4 w-4 text-muted-foreground" />
+                                  <User className="w-4 h-4 mr-2 text-muted-foreground" />
                                   <span>
                                     {customer.name}
                                     {customer.phone && ` • ${customer.phone}`}
@@ -460,10 +460,10 @@ export function SalesForm() {
           </div>
 
           <div className="space-y-6">
-            <div className="border rounded-md p-4 space-y-4">
+            <div className="p-4 space-y-4 border rounded-md">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <ShoppingCart className="h-5 w-5" /> Cart Summary
+                <h2 className="flex items-center gap-2 text-lg font-semibold">
+                  <ShoppingCart className="w-5 h-5" /> Cart Summary
                 </h2>
                 <Badge variant="outline">
                   Invoice:{" "}
@@ -473,7 +473,7 @@ export function SalesForm() {
 
               {cartItems.length === 0 ? (
                 <div className="py-8 text-center text-muted-foreground">
-                  <ShoppingBag className="h-12 w-12 mx-auto mb-2 text-muted-foreground/50" />
+                  <ShoppingBag className="w-12 h-12 mx-auto mb-2 text-muted-foreground/50" />
                   <p>Your cart is empty</p>
                   <p className="text-sm">
                     Search and add products to your cart
@@ -615,7 +615,7 @@ export function SalesForm() {
                 "Processing Sale..."
               ) : (
                 <>
-                  <DollarSign className="mr-2 h-4 w-4" /> Complete Sale
+                  <span>₵</span> Complete Sale
                 </>
               )}
             </Button>

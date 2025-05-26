@@ -85,6 +85,7 @@ export function ServiceRequestForm({
   const updateServiceRequest = useUpdateServiceRequest();
 
   const isAdmin = currentUser?.role === "admin";
+  const isSales = currentUser?.role === "sales";
   const isEditing = !!serviceRequest;
 
   const form = useForm<ServiceRequestFormData>({
@@ -446,7 +447,7 @@ export function ServiceRequestForm({
                               ) : (
                                 <span>Pick a date</span>
                               )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              <CalendarIcon className="w-4 h-4 ml-auto opacity-50" />
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
@@ -466,7 +467,7 @@ export function ServiceRequestForm({
                 />
               </div>
 
-              {isAdmin && (
+              {(isAdmin || isSales) && (
                 <FormField
                   control={form.control}
                   name="assigned_technician_id"
@@ -556,7 +557,7 @@ export function ServiceRequestForm({
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               )}
               {isEditing ? "Update Service Request" : "Create Service Request"}
             </Button>

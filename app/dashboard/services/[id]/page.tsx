@@ -60,6 +60,7 @@ import {
 } from "lucide-react";
 import { ServiceAttachments } from "@/components/services/service-attachments";
 import { ServicePaymentDialog } from "@/components/services/service-payment-dialog";
+import { Toast } from "@/components/ui/toast";
 
 const statusConfig = {
   pending: {
@@ -105,13 +106,13 @@ const priorityConfig = {
 const getPaymentStatusBadge = (status: string) => {
   switch (status) {
     case "paid":
-      return <Badge className="bg-green-100 text-green-800">Paid</Badge>;
+      return <Badge className="text-green-800 bg-green-100">Paid</Badge>;
     case "pending":
-      return <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>;
+      return <Badge className="text-yellow-800 bg-yellow-100">Pending</Badge>;
     case "partial":
-      return <Badge className="bg-blue-100 text-blue-800">Partial</Badge>;
+      return <Badge className="text-blue-800 bg-blue-100">Partial</Badge>;
     case "cancelled":
-      return <Badge className="bg-red-100 text-red-800">Cancelled</Badge>;
+      return <Badge className="text-red-800 bg-red-100">Cancelled</Badge>;
     default:
       return <Badge variant="secondary">{status}</Badge>;
   }
@@ -122,28 +123,28 @@ const getPaymentMethodBadge = (method: string) => {
     case "cash":
       return (
         <Badge variant="outline" className="text-green-600 border-green-600">
-          <DollarSign className="mr-1 h-3 w-3" />
+          <DollarSign className="w-3 h-3 mr-1" />
           Cash
         </Badge>
       );
     case "card":
       return (
         <Badge variant="outline" className="text-blue-600 border-blue-600">
-          <CreditCard className="mr-1 h-3 w-3" />
+          <CreditCard className="w-3 h-3 mr-1" />
           Card
         </Badge>
       );
     case "transfer":
       return (
         <Badge variant="outline" className="text-purple-600 border-purple-600">
-          <Package className="mr-1 h-3 w-3" />
+          <Package className="w-3 h-3 mr-1" />
           Transfer
         </Badge>
       );
     case "check":
       return (
         <Badge variant="outline" className="text-amber-600 border-amber-600">
-          <FileText className="mr-1 h-3 w-3" />
+          <FileText className="w-3 h-3 mr-1" />
           Check
         </Badge>
       );
@@ -192,7 +193,7 @@ export default function ServiceRequestDetailPage() {
     try {
       await updateServiceRequest.mutateAsync({
         id: serviceRequest.id,
-        updates: { status: newStatus as any },
+        status: newStatus as any,
       });
 
       if (updateNote.trim()) {
@@ -201,7 +202,7 @@ export default function ServiceRequestDetailPage() {
           updated_by: currentUser!.id,
           status_from: serviceRequest.status,
           status_to: newStatus,
-          update_type: "note_added",
+          update_type: "status_change",
           title: "Status update with note",
           description: updateNote.trim(),
           is_customer_visible: true,
@@ -213,6 +214,12 @@ export default function ServiceRequestDetailPage() {
       setUpdateNote("");
     } catch (error) {
       console.error("Error updating status:", error);
+      Toast({
+        title: "Error updating status",
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
     } finally {
       setIsUpdating(false);
     }
@@ -225,18 +232,33 @@ export default function ServiceRequestDetailPage() {
     try {
       await updateServiceRequest.mutateAsync({
         id: serviceRequest.id,
-        updates: {
-          assigned_technician_id:
-            selectedTechnician === "unassigned"
-              ? null
-              : selectedTechnician || null,
-        },
+        assigned_technician_id:
+          selectedTechnician === "unassigned"
+            ? null
+            : selectedTechnician || null,
+      });
+
+      // Add an update record for the technician assignment
+      await addUpdate.mutateAsync({
+        service_request_id: serviceRequest.id,
+        updated_by: currentUser!.id,
+        update_type: "technician_assigned",
+        title: selectedTechnician === "unassigned" 
+          ? "Technician unassigned" 
+          : "Technician assigned",
+        description: "Technician assignment updated",
+        is_customer_visible: true,
       });
 
       setAssignDialogOpen(false);
       setSelectedTechnician("");
     } catch (error) {
       console.error("Error assigning technician:", error);
+      Toast({
+        title: "Error assigning technician",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
     } finally {
       setIsUpdating(false);
     }
@@ -253,7 +275,7 @@ export default function ServiceRequestDetailPage() {
   if (error || !serviceRequest) {
     return (
       <div className="flex h-[50vh] flex-col items-center justify-center space-y-4">
-        <AlertCircle className="h-12 w-12 text-red-500" />
+        <AlertCircle className="w-12 h-12 text-red-500" />
         <h2 className="text-xl font-semibold">Service request not found</h2>
         <p className="text-muted-foreground">
           The service request you're looking for doesn't exist or you don't have
@@ -261,7 +283,7 @@ export default function ServiceRequestDetailPage() {
         </p>
         <Link href="/dashboard/services">
           <Button>
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Service Requests
           </Button>
         </Link>
@@ -278,7 +300,7 @@ export default function ServiceRequestDetailPage() {
         <div className="flex items-center space-x-4">
           <Link href="/dashboard/services">
             <Button variant="ghost" size="sm">
-              <ArrowLeft className="mr-2 h-4 w-4" />
+              <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
           </Link>
@@ -291,7 +313,7 @@ export default function ServiceRequestDetailPage() {
         </div>
         <div className="flex items-center space-x-2">
           <Badge className={statusConfig[serviceRequest.status]?.color}>
-            <StatusIcon className="mr-1 h-3 w-3" />
+            <StatusIcon className="w-3 h-3 mr-1" />
             {statusConfig[serviceRequest.status]?.label}
           </Badge>
           <Badge className={priorityConfig[serviceRequest.priority]?.color}>
@@ -300,7 +322,7 @@ export default function ServiceRequestDetailPage() {
           {canEdit && (
             <Link href={`/dashboard/services/${serviceRequest.id}/edit`}>
               <Button size="sm">
-                <Edit className="mr-2 h-4 w-4" />
+                <Edit className="w-4 h-4 mr-2" />
                 Edit
               </Button>
             </Link>
@@ -310,12 +332,12 @@ export default function ServiceRequestDetailPage() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           {/* Service Details */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Wrench className="h-5 w-5" />
+                <Wrench className="w-5 h-5" />
                 <span>Service Details</span>
               </CardTitle>
             </CardHeader>
@@ -394,7 +416,7 @@ export default function ServiceRequestDetailPage() {
                       <Label className="text-sm font-medium text-muted-foreground">
                         Customer Notes
                       </Label>
-                      <p className="mt-1 p-3 bg-muted rounded-md">
+                      <p className="p-3 mt-1 rounded-md bg-muted">
                         {serviceRequest.customer_notes}
                       </p>
                     </div>
@@ -404,7 +426,7 @@ export default function ServiceRequestDetailPage() {
                       <Label className="text-sm font-medium text-muted-foreground">
                         Internal Notes
                       </Label>
-                      <p className="mt-1 p-3 bg-muted rounded-md">
+                      <p className="p-3 mt-1 rounded-md bg-muted">
                         {serviceRequest.internal_notes}
                       </p>
                     </div>
@@ -419,7 +441,7 @@ export default function ServiceRequestDetailPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Package className="h-5 w-5" />
+                  <Package className="w-5 h-5" />
                   <span>Parts Used</span>
                 </CardTitle>
               </CardHeader>
@@ -467,13 +489,13 @@ export default function ServiceRequestDetailPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <MessageSquare className="h-5 w-5" />
+                <MessageSquare className="w-5 h-5" />
                 <span>Updates & Timeline</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
               {updates.length === 0 ? (
-                <p className="text-muted-foreground text-center py-4">
+                <p className="py-4 text-center text-muted-foreground">
                   No updates yet
                 </p>
               ) : (
@@ -481,8 +503,8 @@ export default function ServiceRequestDetailPage() {
                   {updates.map((update) => (
                     <div key={update.id} className="flex space-x-3">
                       <div className="flex-shrink-0">
-                        <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                          <MessageSquare className="h-4 w-4 text-primary" />
+                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+                          <MessageSquare className="w-4 h-4 text-primary" />
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
@@ -493,11 +515,11 @@ export default function ServiceRequestDetailPage() {
                           </p>
                         </div>
                         {update.description && (
-                          <p className="text-muted-foreground mt-1">
+                          <p className="mt-1 text-muted-foreground">
                             {update.description}
                           </p>
                         )}
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="mt-1 text-xs text-muted-foreground">
                           by {update.updated_by_user?.full_name}
                         </p>
                       </div>
@@ -509,7 +531,7 @@ export default function ServiceRequestDetailPage() {
           </Card>
 
           {/* Service Attachments */}
-          <ServiceAttachments serviceRequestId={serviceRequest.id} />
+          {/* <ServiceAttachments serviceRequestId={serviceRequest.id} /> */}
         </div>
 
         {/* Sidebar */}
@@ -527,7 +549,7 @@ export default function ServiceRequestDetailPage() {
                 >
                   <DialogTrigger asChild>
                     <Button className="w-full" variant="outline">
-                      <Settings className="mr-2 h-4 w-4" />
+                      <Settings className="w-4 h-4 mr-2" />
                       Update Status
                     </Button>
                   </DialogTrigger>
@@ -587,14 +609,14 @@ export default function ServiceRequestDetailPage() {
                   </DialogContent>
                 </Dialog>
 
-                <Link
+                {/* <Link
                   href={`/dashboard/services/${serviceRequest.id}/communication`}
                 >
                   <Button className="w-full" variant="outline">
-                    <MessageSquare className="mr-2 h-4 w-4" />
+                    <MessageSquare className="w-4 h-4 mr-2" />
                     Customer Communication
                   </Button>
-                </Link>
+                </Link> */}
 
                 <ServicePaymentDialog serviceRequest={serviceRequest} />
 
@@ -605,7 +627,7 @@ export default function ServiceRequestDetailPage() {
                   >
                     <DialogTrigger asChild>
                       <Button className="w-full" variant="outline">
-                        <User className="mr-2 h-4 w-4" />
+                        <User className="w-4 h-4 mr-2" />
                         Assign Technician
                       </Button>
                     </DialogTrigger>
@@ -671,7 +693,7 @@ export default function ServiceRequestDetailPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <User className="h-5 w-5" />
+                  <User className="w-5 h-5" />
                   <span>Customer</span>
                 </CardTitle>
               </CardHeader>
@@ -686,7 +708,7 @@ export default function ServiceRequestDetailPage() {
                 </div>
                 {serviceRequest.customer.email && (
                   <div className="flex items-center space-x-2">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <Mail className="w-4 h-4 text-muted-foreground" />
                     <span className="text-sm">
                       {serviceRequest.customer.email}
                     </span>
@@ -694,7 +716,7 @@ export default function ServiceRequestDetailPage() {
                 )}
                 {serviceRequest.customer.phone && (
                   <div className="flex items-center space-x-2">
-                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <Phone className="w-4 h-4 text-muted-foreground" />
                     <span className="text-sm">
                       {serviceRequest.customer.phone}
                     </span>
@@ -791,7 +813,7 @@ export default function ServiceRequestDetailPage() {
                     href={`/dashboard/services/${serviceRequest.id}/payment`}
                   >
                     <Button variant="outline" size="sm" className="w-full">
-                      <CreditCard className="mr-2 h-4 w-4" />
+                      <CreditCard className="w-4 h-4 mr-2" />
                       Manage Payment
                     </Button>
                   </Link>

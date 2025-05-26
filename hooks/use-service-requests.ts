@@ -348,7 +348,7 @@ export const useServiceRequestUpdates = (
         .select(
           `
           *,
-          created_by_user:users!created_by(*)
+          updated_by_user:updated_by(*)
         `
         )
         .eq("service_request_id", serviceRequestId)
@@ -378,7 +378,7 @@ export const useServicePartsUsed = (serviceRequestId: string | undefined) => {
         .select(
           `
           *,
-          part:parts(*)
+          product:product_id(*)
         `
         )
         .eq("service_request_id", serviceRequestId)
@@ -403,10 +403,13 @@ export const useAddServiceRequestUpdate = () => {
   return useMutation({
     mutationFn: async (update: {
       service_request_id: string;
+      updated_by: string;
       update_type: string;
-      notes?: string;
-      status_changed_from?: string;
-      status_changed_to?: string;
+      title: string;
+      description?: string;
+      status_from?: string | null;
+      status_to?: string | null;
+      is_customer_visible?: boolean;
     }) => {
       const { data, error } = await supabase
         .from("service_request_updates")
@@ -419,7 +422,7 @@ export const useAddServiceRequestUpdate = () => {
         .select(
           `
           *,
-          created_by_user:users!created_by(*)
+          updated_by_user:updated_by(*)
         `
         )
         .single();
