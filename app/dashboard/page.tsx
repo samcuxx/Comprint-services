@@ -178,7 +178,7 @@ function AdminDashboard({ stats }: { stats: any }) {
       </Card>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {/* <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           title="Total Employees"
           value={stats?.totalEmployees || 0}
@@ -211,13 +211,13 @@ function AdminDashboard({ stats }: { stats: any }) {
           gradient="from-orange-500 to-orange-600"
           href="/dashboard/services"
         />
-      </div>
+      </div> */}
 
       {/* Commission Overview */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="flex items-center gap-2 text-2xl font-bold">
-          ₵ Commission Overview
+          Commission Overview
           </h2>
           <Button asChild variant="outline">
             <Link href="/dashboard/commissions">
@@ -232,8 +232,8 @@ function AdminDashboard({ stats }: { stats: any }) {
 
       {/* Recent Activity */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <RecentActivityCard />
-        <SystemStatusCard />
+        {/* <RecentActivityCard />
+        <SystemStatusCard /> */}
       </div>
     </div>
   );
@@ -284,51 +284,6 @@ function SalesDashboard({ stats }: { stats: any }) {
         </CardContent>
       </Card>
 
-      {/* Sales Performance */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <MetricCard
-          title="Today's Sales"
-          value={salesData?.dailySales || 0}
-          icon={<ShoppingCart className="w-6 h-6" />}
-          trend={+15}
-          gradient="from-green-500 to-green-600"
-          href="/dashboard/sales"
-        />
-        <Card className="relative overflow-hidden">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium">
-              <Target className="w-4 h-4 text-primary" />
-              Monthly Goal
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="text-2xl font-bold">
-                {salesData?.monthlyGoal || 0}%
-              </div>
-              <Progress value={salesData?.monthlyGoal || 0} className="h-2" />
-              <p className="text-xs text-muted-foreground">425 of 500 target</p>
-            </div>
-          </CardContent>
-        </Card>
-        <MetricCard
-          title="New Customers"
-          value={salesData?.newCustomers || 0}
-          icon={<Users className="w-6 h-6" />}
-          trend={+8}
-          gradient="from-blue-500 to-blue-600"
-          href="/dashboard/customers"
-        />
-        <MetricCard
-          title="Low Stock Items"
-          value={salesData?.lowStockItems || 0}
-          icon={<AlertCircle className="w-6 h-6" />}
-          trend={0}
-          gradient="from-orange-500 to-orange-600"
-          href="/dashboard/inventory"
-          isAlert
-        />
-      </div>
 
       {/* Sales Insights */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -386,7 +341,7 @@ function TechnicianDashboard({ stats }: { stats: any }) {
       </Card>
 
       {/* Service Metrics */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {/* <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           title="Active Requests"
           value={techData?.activeServiceRequests || 0}
@@ -439,12 +394,12 @@ function TechnicianDashboard({ stats }: { stats: any }) {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       {/* Service Insights */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <ServiceStatusCard />
-        <RecentServicesCard />
+        {/* <ServiceStatusCard />
+        <RecentServicesCard /> */}
       </div>
     </div>
   );
@@ -555,13 +510,12 @@ function CommissionStatsCards() {
             Total Commissions
           </CardTitle>
           <div className="p-2 text-white rounded-lg bg-gradient-to-r from-green-500 to-green-600">
-            {/* <DollarSign className="w-4 h-4" /> */}
-            ₵
+            {/* <DollarSign className="w-4 h-4" /> */}₵
           </div>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            ${stats.totalCommissions.toFixed(2)}
+            ₵ {stats.totalCommissions.toFixed(2)}
           </div>
         </CardContent>
       </Card>
@@ -577,7 +531,7 @@ function CommissionStatsCards() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            ${stats.paidCommissions.toFixed(2)}
+            ₵ {stats.paidCommissions.toFixed(2)}
           </div>
         </CardContent>
       </Card>
@@ -593,7 +547,7 @@ function CommissionStatsCards() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            ${stats.unpaidCommissions.toFixed(2)}
+            ₵ {stats.unpaidCommissions.toFixed(2)}
           </div>
         </CardContent>
       </Card>
