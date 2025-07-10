@@ -37,16 +37,13 @@ import {
   AreaChart,
 } from "recharts";
 import {
-
   Clock,
-
   AlertTriangle,
-
-
   Wrench,
   Timer,
   Award,
   Zap,
+  Target,
 } from "lucide-react";
 import { TechnicianWorkload } from "@/components/services/technician-workload";
 import { ServiceAnalytics } from "@/components/services/service-analytics";
