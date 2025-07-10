@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useProduct } from "@/hooks/use-products";
+import { useCategories } from "@/hooks/use-categories";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/loading";
@@ -24,8 +25,16 @@ export default function ProductDetailPage() {
   const params = useParams();
   const productId = params.id as string;
   const { data: product, isLoading, isError, error } = useProduct(productId);
+  const { data: categories = [] } = useCategories();
   const { data: currentUser, isLoading: isUserLoading } = useCurrentUser();
   const isAdmin = currentUser?.role === "admin";
+
+  // Find category name by ID
+  const getCategoryName = (categoryId: string | null) => {
+    if (!categoryId) return "No Category";
+    const category = categories.find((cat) => cat.id === categoryId);
+    return category ? category.name : "Unknown Category";
+  };
 
   if (isLoading || isUserLoading) {
     return (
@@ -69,12 +78,6 @@ export default function ProductDetailPage() {
   const inventory =
     Array.isArray(product.inventory) && product.inventory.length > 0
       ? product.inventory[0]
-      : null;
-
-  // Extract category data if it exists
-  const category =
-    Array.isArray(product.category) && product.category.length > 0
-      ? product.category[0]
       : null;
 
   return (
@@ -135,7 +138,7 @@ export default function ProductDetailPage() {
               <p className="text-sm font-medium text-muted-foreground">
                 Category
               </p>
-              <p>{category?.name || "No Category"}</p>
+              <p>{getCategoryName(product.category_id)}</p>
             </div>
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground">

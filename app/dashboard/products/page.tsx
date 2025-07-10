@@ -115,7 +115,7 @@ export default function ProductsPage() {
   if (isProductsError) {
     return (
       <div className="flex h-[70vh] flex-col items-center justify-center space-y-4">
-        <Package className="h-12 w-12 text-red-500" />
+        <Package className="w-12 h-12 text-red-500" />
         <h2 className="text-xl font-semibold">Failed to load products</h2>
         <p className="text-muted-foreground">
           {productsError instanceof Error
@@ -134,7 +134,7 @@ export default function ProductsPage() {
         {isAdmin && (
           <Button asChild>
             <Link href="/dashboard/products/new">
-              <Plus className="mr-2 h-4 w-4" /> Add Product
+              <Plus className="w-4 h-4 mr-2" /> Add Product
             </Link>
           </Button>
         )}
@@ -142,7 +142,7 @@ export default function ProductsPage() {
 
       <div className="flex flex-col gap-4 md:flex-row">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
           <Input
             placeholder="Search products by name, SKU or description..."
             value={searchQuery}
@@ -171,18 +171,18 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      <div className="rounded-md border shadow">
+      <div className="border rounded-md shadow">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b bg-muted/50">
-                <th className="p-4 text-left font-medium">Product</th>
-                <th className="p-4 text-left font-medium">SKU</th>
-                <th className="p-4 text-left font-medium">Category</th>
-                <th className="p-4 text-left font-medium">Price</th>
-                <th className="p-4 text-left font-medium">Commission</th>
-                <th className="p-4 text-left font-medium">Status</th>
-                <th className="p-4 text-left font-medium">Actions</th>
+                <th className="p-4 font-medium text-left">Product</th>
+                <th className="p-4 font-medium text-left">SKU</th>
+                <th className="p-4 font-medium text-left">Category</th>
+                <th className="p-4 font-medium text-left">Price</th>
+                <th className="p-4 font-medium text-left">Commission</th>
+                <th className="p-4 font-medium text-left">Status</th>
+                <th className="p-4 font-medium text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -201,7 +201,7 @@ export default function ProductsPage() {
                 filteredProducts.map((product) => (
                   <tr
                     key={product.id}
-                    className="border-b hover:bg-muted/30 transition-colors"
+                    className="transition-colors border-b hover:bg-muted/30"
                   >
                     <td className="p-4">
                       <div className="flex items-center space-x-3">
@@ -209,11 +209,11 @@ export default function ProductsPage() {
                           <img
                             src={product.image_url}
                             alt={product.name}
-                            className="h-10 w-10 rounded-md object-cover"
+                            className="object-cover w-10 h-10 rounded-md"
                           />
                         ) : (
-                          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-muted">
-                            <Package className="h-5 w-5 text-muted-foreground" />
+                          <div className="flex items-center justify-center w-10 h-10 rounded-md bg-muted">
+                            <Package className="w-5 h-5 text-muted-foreground" />
                           </div>
                         )}
                         <span className="font-medium">{product.name}</span>
@@ -243,7 +243,7 @@ export default function ProductsPage() {
                       <div className="flex space-x-2">
                         <Button variant="outline" size="sm" asChild>
                           <Link href={`/dashboard/products/${product.id}`}>
-                            <Eye className="h-4 w-4" />
+                            <Eye className="w-4 h-4" />
                           </Link>
                         </Button>
 
@@ -253,7 +253,7 @@ export default function ProductsPage() {
                               <Link
                                 href={`/dashboard/products/${product.id}/edit`}
                               >
-                                <Pencil className="h-4 w-4" />
+                                <Pencil className="w-4 h-4" />
                               </Link>
                             </Button>
                             <Button
@@ -265,7 +265,7 @@ export default function ProductsPage() {
                               }}
                               aria-label={`Delete ${product.name}`}
                             >
-                              <Trash2 className="h-4 w-4 text-red-500" />
+                              <Trash2 className="w-4 h-4 text-red-500" />
                             </Button>
                           </>
                         )}
