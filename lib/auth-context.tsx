@@ -1,8 +1,8 @@
 "use client";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { UserRole } from "./types";
 
 interface AuthContextType {
@@ -26,6 +26,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
+  const currentPathRef = useRef(pathname);
+
+  // Update the ref when pathname changes
+  useEffect(() => {
+    currentPathRef.current = pathname;
+  }, [pathname]);
 
   const fetchUserRole = async (userId: string) => {
     try {
@@ -122,10 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === "SIGNED_IN" && session) {
-        await updateUserState(session.user, session);
-        router.push("/dashboard");
-      } else if (event === "SIGNED_OUT") {
+      if (event === "SIGNED_OUT") {
         setUser(null);
         setSession(null);
         setUserRole(null);
@@ -134,9 +138,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Handle user profile updates
         await updateUserState(session.user, session);
       } else if (event === "TOKEN_REFRESHED" && session) {
-        // Update session only
+        // Update session only, don't redirect
         setSession(session);
-      }
+             } else if (event === "SIGNED_IN" && session) {
+         // Only redirect on actual sign-in if we're on the login page
+         // This prevents redirects on token refresh/session validation
+         await updateUserState(session.user, session);
+         if (currentPathRef.current === "/auth/login" || currentPathRef.current === "/") {
+           router.push("/dashboard");
+         }
+       }
     });
 
     return () => subscription.unsubscribe();
