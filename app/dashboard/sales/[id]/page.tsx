@@ -10,7 +10,6 @@ import {
   User,
   Calendar,
   Receipt,
-  DollarSign,
   CreditCard,
   FileText,
   Printer,

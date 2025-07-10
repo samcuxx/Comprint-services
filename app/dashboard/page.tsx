@@ -8,9 +8,7 @@ import {
   Users,
   Package,
   ShoppingCart,
-  ClipboardList,
   Loader2,
-  DollarSign,
   CheckCircle,
   AlertCircle,
   Percent,
@@ -21,13 +19,11 @@ import {
   Activity,
   Calendar,
   Clock,
-  Target,
   Award,
   Wrench,
   FileText,
   BarChart3,
   ArrowRight,
-  Star,
   Zap,
 } from "lucide-react";
 import { useDashboardStats } from "@/hooks/use-dashboard-stats";
@@ -510,7 +506,7 @@ function CommissionStatsCards() {
             Total Commissions
           </CardTitle>
           <div className="p-2 text-white rounded-lg bg-gradient-to-r from-green-500 to-green-600">
-            {/* <DollarSign className="w-4 h-4" /> */}₵
+           ₵
           </div>
         </CardHeader>
         <CardContent>

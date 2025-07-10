@@ -19,7 +19,6 @@ import { formatCurrency } from "@/lib/utils";
 import {
   Package,
   TrendingUp,
-  DollarSign,
   AlertTriangle,
   Trophy,
   BarChart3,
@@ -56,7 +55,7 @@ export function ProductPerformanceReport() {
 
   if (isLoading) {
     return (
-      <div className="flex h-64 items-center justify-center">
+      <div className="flex items-center justify-center h-64">
         <Loading />
       </div>
     );
@@ -64,8 +63,8 @@ export function ProductPerformanceReport() {
 
   if (isError) {
     return (
-      <div className="flex h-64 flex-col items-center justify-center space-y-4">
-        <Package className="h-12 w-12 text-red-500" />
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <Package className="w-12 h-12 text-red-500" />
         <h3 className="text-lg font-semibold">
           Failed to load product performance
         </h3>
@@ -84,7 +83,7 @@ export function ProductPerformanceReport() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center space-x-2">
           <div className="flex items-center space-x-2">
-            <Filter className="h-4 w-4 text-muted-foreground" />
+            <Filter className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm font-medium">Filters:</span>
           </div>
 
@@ -142,7 +141,7 @@ export function ProductPerformanceReport() {
               onClick={clearFilters}
               className="h-9"
             >
-              <X className="mr-1 h-4 w-4" />
+              <X className="w-4 h-4 mr-1" />
               Clear
             </Button>
           )}
@@ -155,7 +154,7 @@ export function ProductPerformanceReport() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Trophy className="h-5 w-5 text-primary" />
+                <Trophy className="w-5 h-5 text-primary" />
                 <span>Top Selling Products</span>
               </CardTitle>
             </CardHeader>
@@ -164,13 +163,13 @@ export function ProductPerformanceReport() {
                 {performanceData.topProducts.map((product, index) => (
                   <div
                     key={product.product.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                    className="flex items-center justify-between p-4 transition-colors border rounded-lg hover:bg-muted/50"
                   >
                     <div className="flex items-center space-x-3">
                       <div className="flex-shrink-0">
                         <Badge
                           variant={index < 3 ? "default" : "secondary"}
-                          className="w-8 h-8 rounded-full flex items-center justify-center"
+                          className="flex items-center justify-center w-8 h-8 rounded-full"
                         >
                           {index + 1}
                         </Badge>
@@ -214,7 +213,7 @@ export function ProductPerformanceReport() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <BarChart3 className="h-5 w-5 text-primary" />
+                <BarChart3 className="w-5 h-5 text-primary" />
                 <span>Category Performance</span>
               </CardTitle>
             </CardHeader>
@@ -225,10 +224,10 @@ export function ProductPerformanceReport() {
                   .map((category) => (
                     <div
                       key={category.category_name}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                      className="flex items-center justify-between p-4 transition-colors border rounded-lg hover:bg-muted/50"
                     >
                       <div className="flex items-center space-x-3">
-                        <Tag className="h-5 w-5 text-muted-foreground" />
+                        <Tag className="w-5 h-5 text-muted-foreground" />
                         <div>
                           <div className="font-medium">
                             {category.category_name}
@@ -263,7 +262,7 @@ export function ProductPerformanceReport() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
+                <AlertTriangle className="w-5 h-5 text-red-500" />
                 <span>Low Stock Alerts</span>
                 <Badge variant="destructive" className="ml-2">
                   {performanceData.lowStockProducts.length}
@@ -275,10 +274,10 @@ export function ProductPerformanceReport() {
                 {performanceData.lowStockProducts.map((item) => (
                   <div
                     key={item.product.id}
-                    className="flex items-center justify-between p-4 border border-red-200 rounded-lg bg-red-50/50 hover:bg-red-50 transition-colors"
+                    className="flex items-center justify-between p-4 transition-colors border border-red-200 rounded-lg bg-red-50/50 hover:bg-red-50"
                   >
                     <div className="flex items-center space-x-3">
-                      <AlertTriangle className="h-5 w-5 text-red-500" />
+                      <AlertTriangle className="w-5 h-5 text-red-500" />
                       <div>
                         <div className="font-medium">{item.product.name}</div>
                         <div className="text-sm text-muted-foreground">
@@ -305,9 +304,9 @@ export function ProductPerformanceReport() {
       {performanceData?.topProducts &&
         performanceData.topProducts.length === 0 && (
           <Card>
-            <CardContent className="text-center py-12">
-              <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">
+            <CardContent className="py-12 text-center">
+              <Package className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="mb-2 text-lg font-semibold">
                 No product data available
               </h3>
               <p className="text-muted-foreground">

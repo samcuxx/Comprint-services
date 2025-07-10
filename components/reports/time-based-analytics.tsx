@@ -13,7 +13,6 @@ import {
   Calendar,
   TrendingUp,
   BarChart3,
-  DollarSign,
   Activity,
   Filter,
   X,
@@ -52,14 +51,14 @@ export function TimeBasedAnalytics() {
 
   const getHourIcon = (hour: number) => {
     if (hour >= 6 && hour < 18) {
-      return <Sun className="h-4 w-4 text-yellow-500" />;
+      return <Sun className="w-4 h-4 text-yellow-500" />;
     }
-    return <Moon className="h-4 w-4 text-blue-500" />;
+    return <Moon className="w-4 h-4 text-blue-500" />;
   };
 
   if (isLoading) {
     return (
-      <div className="flex h-64 items-center justify-center">
+      <div className="flex items-center justify-center h-64">
         <Loading />
       </div>
     );
@@ -67,8 +66,8 @@ export function TimeBasedAnalytics() {
 
   if (isError) {
     return (
-      <div className="flex h-64 flex-col items-center justify-center space-y-4">
-        <Clock className="h-12 w-12 text-red-500" />
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <Clock className="w-12 h-12 text-red-500" />
         <h3 className="text-lg font-semibold">Failed to load time analytics</h3>
         <p className="text-muted-foreground">
           {error instanceof Error
@@ -85,7 +84,7 @@ export function TimeBasedAnalytics() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center space-x-2">
           <div className="flex items-center space-x-2">
-            <Filter className="h-4 w-4 text-muted-foreground" />
+            <Filter className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm font-medium">Filters:</span>
           </div>
 
@@ -121,7 +120,7 @@ export function TimeBasedAnalytics() {
               onClick={clearFilters}
               className="h-9"
             >
-              <X className="mr-1 h-4 w-4" />
+              <X className="w-4 h-4 mr-1" />
               Clear
             </Button>
           )}
@@ -133,19 +132,19 @@ export function TimeBasedAnalytics() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Calendar className="h-5 w-5 text-primary" />
+              <Calendar className="w-5 h-5 text-primary" />
               <span>Daily Sales Performance</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2 max-h-64 overflow-y-auto">
+            <div className="space-y-2 overflow-y-auto max-h-64">
               {analyticsData.dailySales.slice(-14).map((day) => (
                 <div
                   key={day.date}
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                  className="flex items-center justify-between p-3 transition-colors border rounded-lg hover:bg-muted/50"
                 >
                   <div className="flex items-center space-x-3">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
                     <div>
                       <div className="font-medium">
                         {format(new Date(day.date), "EEEE, MMM d")}
@@ -175,7 +174,7 @@ export function TimeBasedAnalytics() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <BarChart3 className="h-5 w-5 text-primary" />
+              <BarChart3 className="w-5 h-5 text-primary" />
               <span>Monthly Sales Overview</span>
             </CardTitle>
           </CardHeader>
@@ -184,10 +183,10 @@ export function TimeBasedAnalytics() {
               {analyticsData.monthlySales.slice(-6).map((month) => (
                 <div
                   key={month.month}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                  className="flex items-center justify-between p-4 transition-colors border rounded-lg hover:bg-muted/50"
                 >
                   <div className="flex items-center space-x-3">
-                    <BarChart3 className="h-5 w-5 text-muted-foreground" />
+                    <BarChart3 className="w-5 h-5 text-muted-foreground" />
                     <div>
                       <div className="font-medium">
                         {format(new Date(month.month + "-01"), "MMMM yyyy")}
@@ -222,12 +221,12 @@ export function TimeBasedAnalytics() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Clock className="h-5 w-5 text-primary" />
+                <Clock className="w-5 h-5 text-primary" />
                 <span>Sales by Hour of Day</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2 max-h-64 overflow-y-auto">
+              <div className="space-y-2 overflow-y-auto max-h-64">
                 {analyticsData.salesByHour
                   .filter((hour) => hour.sales_count > 0)
                   .sort((a, b) => b.sales_count - a.sales_count)
@@ -235,7 +234,7 @@ export function TimeBasedAnalytics() {
                   .map((hour) => (
                     <div
                       key={hour.hour}
-                      className="flex items-center justify-between p-2 border rounded hover:bg-muted/50 transition-colors"
+                      className="flex items-center justify-between p-2 transition-colors border rounded hover:bg-muted/50"
                     >
                       <div className="flex items-center space-x-2">
                         {getHourIcon(hour.hour)}
@@ -263,7 +262,7 @@ export function TimeBasedAnalytics() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Activity className="h-5 w-5 text-primary" />
+                <Activity className="w-5 h-5 text-primary" />
                 <span>Sales by Day of Week</span>
               </CardTitle>
             </CardHeader>
@@ -274,10 +273,10 @@ export function TimeBasedAnalytics() {
                   .map((day) => (
                     <div
                       key={day.day_of_week}
-                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                      className="flex items-center justify-between p-3 transition-colors border rounded-lg hover:bg-muted/50"
                     >
                       <div className="flex items-center space-x-3">
-                        <Activity className="h-4 w-4 text-muted-foreground" />
+                        <Activity className="w-4 h-4 text-muted-foreground" />
                         <span className="font-medium">{day.day_of_week}</span>
                       </div>
                       <div className="text-right">
@@ -305,9 +304,9 @@ export function TimeBasedAnalytics() {
       {/* Empty States */}
       {analyticsData?.dailySales && analyticsData.dailySales.length === 0 && (
         <Card>
-          <CardContent className="text-center py-12">
-            <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">
+          <CardContent className="py-12 text-center">
+            <Clock className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+            <h3 className="mb-2 text-lg font-semibold">
               No analytics data available
             </h3>
             <p className="text-muted-foreground">

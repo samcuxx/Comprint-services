@@ -26,7 +26,6 @@ import {
   TrendingUp,
   TrendingDown,
   Clock,
-  DollarSign,
   Users,
   Target,
   AlertTriangle,
@@ -210,11 +209,12 @@ export function ServiceAnalytics({ timeRange }: ServiceAnalyticsProps) {
       {/* Key Performance Indicators */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">
               Avg. Service Value
             </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+
+            <span> ₵ </span>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -227,11 +227,11 @@ export function ServiceAnalytics({ timeRange }: ServiceAnalyticsProps) {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">
               Avg. Completion Time
             </CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
+            <Clock className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -244,9 +244,9 @@ export function ServiceAnalytics({ timeRange }: ServiceAnalyticsProps) {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
+            <Target className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -257,11 +257,11 @@ export function ServiceAnalytics({ timeRange }: ServiceAnalyticsProps) {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">
               Active Requests
             </CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
+            <Activity className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -491,8 +491,8 @@ export function ServiceAnalytics({ timeRange }: ServiceAnalyticsProps) {
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <div className="p-4 border rounded-lg">
-              <div className="flex items-center space-x-2 mb-2">
-                <TrendingUp className="h-5 w-5 text-green-500" />
+              <div className="flex items-center mb-2 space-x-2">
+                <TrendingUp className="w-5 h-5 text-green-500" />
                 <span className="font-medium">Top Performing Category</span>
               </div>
               <div className="text-lg font-bold">
@@ -505,8 +505,8 @@ export function ServiceAnalytics({ timeRange }: ServiceAnalyticsProps) {
             </div>
 
             <div className="p-4 border rounded-lg">
-              <div className="flex items-center space-x-2 mb-2">
-                <Clock className="h-5 w-5 text-blue-500" />
+              <div className="flex items-center mb-2 space-x-2">
+                <Clock className="w-5 h-5 text-blue-500" />
                 <span className="font-medium">Fastest Service</span>
               </div>
               <div className="text-lg font-bold">
@@ -520,8 +520,8 @@ export function ServiceAnalytics({ timeRange }: ServiceAnalyticsProps) {
             </div>
 
             <div className="p-4 border rounded-lg">
-              <div className="flex items-center space-x-2 mb-2">
-                <DollarSign className="h-5 w-5 text-green-500" />
+              <div className="flex items-center mb-2 space-x-2">
+                <span> ₵ </span>
                 <span className="font-medium">Revenue Growth</span>
               </div>
               <div className="text-lg font-bold">

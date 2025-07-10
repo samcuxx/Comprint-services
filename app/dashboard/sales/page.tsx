@@ -11,7 +11,6 @@ import {
   Receipt,
   User,
   Calendar,
-  DollarSign,
   MoreHorizontal,
   FileText,
   Trash2,
@@ -183,7 +182,7 @@ export default function SalesPage() {
   if (isSalesError) {
     return (
       <div className="flex h-[70vh] flex-col items-center justify-center space-y-4">
-        <ShoppingCart className="h-12 w-12 text-red-500" />
+        <ShoppingCart className="w-12 h-12 text-red-500" />
         <h2 className="text-xl font-semibold">Failed to load sales</h2>
         <p className="text-muted-foreground">
           {salesError instanceof Error
@@ -202,7 +201,7 @@ export default function SalesPage() {
         {(isAdmin || isSales) && (
           <Button asChild>
             <Link href="/dashboard/sales/new">
-              <Plus className="mr-2 h-4 w-4" /> New Sale
+              <Plus className="w-4 h-4 mr-2" /> New Sale
             </Link>
           </Button>
         )}
@@ -212,11 +211,11 @@ export default function SalesPage() {
         <div className="flex items-center space-x-2">
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-9 border-dashed">
-                <Filter className="mr-2 h-4 w-4" />
+              <Button variant="outline" size="sm" className="border-dashed h-9">
+                <Filter className="w-4 h-4 mr-2" />
                 Filters
                 {activeFiltersCount > 0 && (
-                  <Badge variant="secondary" className="ml-2 rounded-full px-1">
+                  <Badge variant="secondary" className="px-1 ml-2 rounded-full">
                     {activeFiltersCount}
                   </Badge>
                 )}
@@ -227,7 +226,7 @@ export default function SalesPage() {
                 <div className="space-y-2">
                   <h4 className="font-medium">Date Range</h4>
                   <div className="grid gap-2">
-                    <div className="grid grid-cols-3 items-center gap-4">
+                    <div className="grid items-center grid-cols-3 gap-4">
                       <Label htmlFor="from">From</Label>
                       <div className="col-span-2">
                         <Input
@@ -243,7 +242,7 @@ export default function SalesPage() {
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-3 items-center gap-4">
+                    <div className="grid items-center grid-cols-3 gap-4">
                       <Label htmlFor="to">To</Label>
                       <div className="col-span-2">
                         <Input
@@ -315,7 +314,7 @@ export default function SalesPage() {
                     onClick={clearFilters}
                     variant="outline"
                   >
-                    <X className="mr-2 h-4 w-4" />
+                    <X className="w-4 h-4 mr-2" />
                     Clear Filters
                   </Button>
                   <Button className="w-full" onClick={() => refetchSales()}>
@@ -339,18 +338,18 @@ export default function SalesPage() {
         </div>
       </div>
 
-      <div className="rounded-md border shadow">
+      <div className="border rounded-md shadow">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b bg-muted/50">
-                <th className="p-4 text-left font-medium">Invoice</th>
-                <th className="p-4 text-left font-medium">Date</th>
-                <th className="p-4 text-left font-medium">Customer</th>
-                <th className="p-4 text-left font-medium">Payment</th>
-                <th className="p-4 text-left font-medium">Amount</th>
-                <th className="p-4 text-left font-medium">Status</th>
-                <th className="p-4 text-left font-medium">Actions</th>
+                <th className="p-4 font-medium text-left">Invoice</th>
+                <th className="p-4 font-medium text-left">Date</th>
+                <th className="p-4 font-medium text-left">Customer</th>
+                <th className="p-4 font-medium text-left">Payment</th>
+                <th className="p-4 font-medium text-left">Amount</th>
+                <th className="p-4 font-medium text-left">Status</th>
+                <th className="p-4 font-medium text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -369,7 +368,7 @@ export default function SalesPage() {
                 sales.map((sale) => (
                   <tr
                     key={sale.id}
-                    className="border-b hover:bg-muted/30 transition-colors"
+                    className="transition-colors border-b hover:bg-muted/30"
                   >
                     <td className="p-4 font-medium">
                       <Link
@@ -386,9 +385,9 @@ export default function SalesPage() {
                       {sale.customer ? (
                         <Link
                           href={`/dashboard/customers/${sale.customer.id}`}
-                          className="hover:underline flex items-center"
+                          className="flex items-center hover:underline"
                         >
-                          <User className="mr-2 h-4 w-4 text-muted-foreground" />
+                          <User className="w-4 h-4 mr-2 text-muted-foreground" />
                           {sale.customer.name}
                         </Link>
                       ) : (
@@ -408,14 +407,14 @@ export default function SalesPage() {
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
+                            <MoreHorizontal className="w-4 h-4" />
                             <span className="sr-only">Actions</span>
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem asChild>
                             <Link href={`/dashboard/sales/${sale.id}`}>
-                              <FileText className="mr-2 h-4 w-4" />
+                              <FileText className="w-4 h-4 mr-2" />
                               View Details
                             </Link>
                           </DropdownMenuItem>
@@ -427,7 +426,7 @@ export default function SalesPage() {
                                 setIsDeleteDialogOpen(true);
                               }}
                             >
-                              <Trash2 className="mr-2 h-4 w-4" />
+                              <Trash2 className="w-4 h-4 mr-2" />
                               Delete Sale
                             </DropdownMenuItem>
                           )}

@@ -7,7 +7,7 @@ import { Loading } from "@/components/ui/loading";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import {
-  DollarSign,
+
   CircleDollarSign,
   CheckCircle,
   AlertCircle,
@@ -29,7 +29,7 @@ export function CommissionSummary({ salesPersonId }: CommissionSummaryProps) {
 
   if (isLoading) {
     return (
-      <div className="flex h-40 items-center justify-center">
+      <div className="flex items-center justify-center h-40">
         <Loading />
       </div>
     );
@@ -37,8 +37,8 @@ export function CommissionSummary({ salesPersonId }: CommissionSummaryProps) {
 
   if (isError || !summary) {
     return (
-      <div className="flex h-40 flex-col items-center justify-center space-y-2">
-        <AlertCircle className="h-8 w-8 text-red-500" />
+      <div className="flex flex-col items-center justify-center h-40 space-y-2">
+        <AlertCircle className="w-8 h-8 text-red-500" />
         <p className="text-sm text-muted-foreground">
           {error instanceof Error
             ? error.message
@@ -51,25 +51,25 @@ export function CommissionSummary({ salesPersonId }: CommissionSummaryProps) {
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-xl flex items-center">
-          <CircleDollarSign className="h-5 w-5 mr-2 text-primary" />
+        <CardTitle className="flex items-center text-xl">
+          <CircleDollarSign className="w-5 h-5 mr-2 text-primary" />
           Commission Summary
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <SummaryItem
-            icon={<DollarSign className="h-5 w-5 text-primary" />}
+            icon={<span> ₵ </span>}
             label="Total Commission"
             value={formatCurrency(summary.totalCommission)}
           />
           <SummaryItem
-            icon={<CheckCircle className="h-5 w-5 text-green-500" />}
+            icon={<CheckCircle className="w-5 h-5 text-green-500" />}
             label="Paid Commission"
             value={formatCurrency(summary.paidCommission)}
           />
           <SummaryItem
-            icon={<AlertCircle className="h-5 w-5 text-amber-500" />}
+            icon={<AlertCircle className="w-5 h-5 text-amber-500" />}
             label="Unpaid Commission"
             value={formatCurrency(summary.unpaidCommission)}
           />
@@ -79,12 +79,12 @@ export function CommissionSummary({ salesPersonId }: CommissionSummaryProps) {
 
         <div className="flex items-center justify-between">
           <div className="text-sm">
-            <span className="text-muted-foreground mr-1">Total Records:</span>
+            <span className="mr-1 text-muted-foreground">Total Records:</span>
             <span className="font-medium">{summary.commissionsCount}</span>
           </div>
           <Button size="sm" variant="outline" asChild>
             <Link href="/dashboard/commissions">
-              <History className="h-4 w-4 mr-2" />
+              <History className="w-4 h-4 mr-2" />
               View All Commissions
             </Link>
           </Button>
@@ -106,7 +106,7 @@ function SummaryItem({ icon, label, value }: SummaryItemProps) {
       <div className="text-sm text-muted-foreground">{label}</div>
       <div className="flex items-center">
         {icon}
-        <span className="text-lg font-semibold ml-1">{value}</span>
+        <span className="ml-1 text-lg font-semibold">{value}</span>
       </div>
     </div>
   );

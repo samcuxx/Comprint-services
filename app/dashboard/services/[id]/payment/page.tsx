@@ -39,7 +39,6 @@ import { formatCurrency, formatDateTime } from "@/lib/utils";
 import {
   ArrowLeft,
   CreditCard,
-  DollarSign,
   Receipt,
   CheckCircle,
   Clock,
@@ -352,7 +351,6 @@ export default function ServicePaymentPage() {
                             <SelectContent>
                               <SelectItem value="cash">
                                 <div className="flex items-center space-x-2">
-                                  {/* <DollarSign className="w-4 h-4" /> */}
                                   <span>₵ Cash</span>
                                 </div>
                               </SelectItem>
@@ -394,7 +392,8 @@ export default function ServicePaymentPage() {
                               </SelectItem>
                               <SelectItem value="partial">
                                 <div className="flex items-center space-x-2">
-                                  <DollarSign className="w-4 h-4 text-blue-600" />
+                                  {" "}
+                                  <span className="text-blue-600"> ₵</span>{" "}
                                   <span>Partial</span>
                                 </div>
                               </SelectItem>

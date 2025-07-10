@@ -39,13 +39,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/utils";
-import {
-  CreditCard,
-  DollarSign,
-  Loader2,
-  Receipt,
-  CheckCircle,
-} from "lucide-react";
+import { CreditCard, Loader2, Receipt, CheckCircle } from "lucide-react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 
 const paymentSchema = z.object({
@@ -155,7 +149,7 @@ export function ServicePaymentDialog({
       case "card":
         return <CreditCard className="w-4 h-4" />;
       case "cash":
-        return <DollarSign className="w-4 h-4" />;
+        return <span className="text-green-600"> ₵ </span>;
       default:
         return <Receipt className="w-4 h-4" />;
     }
@@ -248,7 +242,6 @@ export function ServicePaymentDialog({
                     <SelectContent>
                       <SelectItem value="cash">
                         <div className="flex items-center space-x-2">
-                          {/* <DollarSign className="w-4 h-4" /> */}
                           <span>₵ Cash</span>
                         </div>
                       </SelectItem>

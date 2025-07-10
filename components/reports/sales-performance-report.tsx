@@ -19,7 +19,6 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import { format } from "date-fns";
 import {
-  DollarSign,
   TrendingUp,
   ShoppingCart,
   Target,
@@ -66,7 +65,7 @@ export function SalesPerformanceReport() {
 
   if (isLoading) {
     return (
-      <div className="flex h-64 items-center justify-center">
+      <div className="flex items-center justify-center h-64">
         <Loading />
       </div>
     );
@@ -74,8 +73,8 @@ export function SalesPerformanceReport() {
 
   if (isError) {
     return (
-      <div className="flex h-64 flex-col items-center justify-center space-y-4">
-        <TrendingUp className="h-12 w-12 text-red-500" />
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <TrendingUp className="w-12 h-12 text-red-500" />
         <h3 className="text-lg font-semibold">
           Failed to load sales performance
         </h3>
@@ -95,7 +94,7 @@ export function SalesPerformanceReport() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center space-x-2">
             <div className="flex items-center space-x-2">
-              <Filter className="h-4 w-4 text-muted-foreground" />
+              <Filter className="w-4 h-4 text-muted-foreground" />
               <span className="text-sm font-medium">Filters:</span>
             </div>
 
@@ -156,7 +155,7 @@ export function SalesPerformanceReport() {
                 onClick={clearFilters}
                 className="h-9"
               >
-                <X className="mr-1 h-4 w-4" />
+                <X className="w-4 h-4 mr-1" />
                 Clear
               </Button>
             )}
@@ -167,9 +166,9 @@ export function SalesPerformanceReport() {
       {/* KPI Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
-            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+            <ShoppingCart className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -182,9 +181,9 @@ export function SalesPerformanceReport() {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <span> ₵ </span>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -197,11 +196,11 @@ export function SalesPerformanceReport() {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">
               Average Order Value
             </CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
+            <Target className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -214,11 +213,11 @@ export function SalesPerformanceReport() {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">
               Top Performers
             </CardTitle>
-            <Crown className="h-4 w-4 text-muted-foreground" />
+            <Crown className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -238,7 +237,7 @@ export function SalesPerformanceReport() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Crown className="h-5 w-5 text-primary" />
+                <Crown className="w-5 h-5 text-primary" />
                 <span>Top Performing Sales Team</span>
               </CardTitle>
             </CardHeader>
@@ -253,7 +252,7 @@ export function SalesPerformanceReport() {
                       <div className="flex-shrink-0">
                         <Badge
                           variant={index === 0 ? "default" : "secondary"}
-                          className="w-8 h-8 rounded-full flex items-center justify-center"
+                          className="flex items-center justify-center w-8 h-8 rounded-full"
                         >
                           {index + 1}
                         </Badge>
@@ -290,7 +289,7 @@ export function SalesPerformanceReport() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Calendar className="h-5 w-5 text-primary" />
+              <Calendar className="w-5 h-5 text-primary" />
               <span>Sales Trend (Last 30 Days)</span>
             </CardTitle>
           </CardHeader>
@@ -300,10 +299,10 @@ export function SalesPerformanceReport() {
                 {performanceData.salesTrend.slice(-7).map((day) => (
                   <div
                     key={day.date}
-                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                    className="flex items-center justify-between p-3 transition-colors border rounded-lg hover:bg-muted/50"
                   >
                     <div className="flex items-center space-x-3">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <Calendar className="w-4 h-4 text-muted-foreground" />
                       <div>
                         <div className="font-medium">
                           {format(new Date(day.date), "EEEE, MMM d")}
@@ -329,8 +328,8 @@ export function SalesPerformanceReport() {
               </div>
 
               {performanceData.salesTrend.length === 0 && (
-                <div className="text-center py-8">
-                  <TrendingUp className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <div className="py-8 text-center">
+                  <TrendingUp className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
                   <p className="text-muted-foreground">
                     No sales data available for the selected period
                   </p>

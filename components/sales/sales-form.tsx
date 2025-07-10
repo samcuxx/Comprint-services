@@ -43,7 +43,6 @@ import {
   Search,
   Package,
   User,
-  DollarSign,
   Calculator,
   Receipt,
   Plus,

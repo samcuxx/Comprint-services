@@ -2,7 +2,7 @@
 
 import { CommissionList } from "@/components/commissions/commission-list";
 import { Button } from "@/components/ui/button";
-import { DollarSign, FileText } from "lucide-react";
+import {  FileText } from "lucide-react";
 
 export default function CommissionsPage() {
   return (
@@ -11,7 +11,7 @@ export default function CommissionsPage() {
         <h1 className="text-2xl font-bold">Commissions</h1>
         <Button variant="outline" asChild>
           <a href="#" onClick={() => window.print()}>
-            <FileText className="mr-2 h-4 w-4" /> Export Report
+            <FileText className="w-4 h-4 mr-2" /> Export Report
           </a>
         </Button>
       </div>

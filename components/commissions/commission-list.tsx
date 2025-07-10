@@ -49,14 +49,13 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import {
-  Calendar,
+
   Check,
   ChevronDown,
   ChevronRight,
-  DollarSign,
   Filter,
   MoreHorizontal,
-  Search,
+
   User,
   X,
   CreditCard,
@@ -294,7 +293,7 @@ export function CommissionList() {
   if (isCommissionsError) {
     return (
       <div className="flex h-[50vh] flex-col items-center justify-center space-y-4">
-        <DollarSign className="h-12 w-12 text-red-500" />
+        <span> ₵ </span>
         <h2 className="text-xl font-semibold">Failed to load commissions</h2>
         <p className="text-muted-foreground">
           {commissionsError instanceof Error
@@ -313,11 +312,11 @@ export function CommissionList() {
         <div className="flex items-center space-x-2">
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-9 border-dashed">
-                <Filter className="mr-2 h-4 w-4" />
+              <Button variant="outline" size="sm" className="border-dashed h-9">
+                <Filter className="w-4 h-4 mr-2" />
                 Filters
                 {activeFiltersCount > 0 && (
-                  <Badge variant="secondary" className="ml-2 rounded-full px-1">
+                  <Badge variant="secondary" className="px-1 ml-2 rounded-full">
                     {activeFiltersCount}
                   </Badge>
                 )}
@@ -328,7 +327,7 @@ export function CommissionList() {
                 <div className="space-y-2">
                   <h4 className="font-medium">Date Range</h4>
                   <div className="grid gap-2">
-                    <div className="grid grid-cols-3 items-center gap-4">
+                    <div className="grid items-center grid-cols-3 gap-4">
                       <Label htmlFor="from">From</Label>
                       <div className="col-span-2">
                         <Input
@@ -344,7 +343,7 @@ export function CommissionList() {
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-3 items-center gap-4">
+                    <div className="grid items-center grid-cols-3 gap-4">
                       <Label htmlFor="to">To</Label>
                       <div className="col-span-2">
                         <Input
@@ -430,7 +429,7 @@ export function CommissionList() {
                     onClick={clearFilters}
                     variant="outline"
                   >
-                    <X className="mr-2 h-4 w-4" />
+                    <X className="w-4 h-4 mr-2" />
                     Clear Filters
                   </Button>
                   <Button
@@ -460,9 +459,9 @@ export function CommissionList() {
       {/* Grouped Commissions */}
       <div className="space-y-4">
         {groupedCommissions.length === 0 ? (
-          <div className="text-center py-12">
-            <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No commissions found</h3>
+          <div className="py-12 text-center">
+            <Users className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+            <h3 className="mb-2 text-lg font-semibold">No commissions found</h3>
             <p className="text-muted-foreground">
               {activeFiltersCount > 0
                 ? "No commissions match your filter criteria"
@@ -480,16 +479,16 @@ export function CommissionList() {
                 onOpenChange={() => toggleGroup(group.salesPerson.id)}
               >
                 <CollapsibleTrigger className="w-full">
-                  <div className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center justify-between p-4 transition-colors hover:bg-muted/50">
                     <div className="flex items-center space-x-3">
                       {openGroups.has(group.salesPerson.id) ? (
-                        <ChevronDown className="h-4 w-4" />
+                        <ChevronDown className="w-4 h-4" />
                       ) : (
-                        <ChevronRight className="h-4 w-4" />
+                        <ChevronRight className="w-4 h-4" />
                       )}
                       <div className="flex items-center space-x-3">
-                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                          <User className="h-4 w-4 text-primary" />
+                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+                          <User className="w-4 h-4 text-primary" />
                         </div>
                         <div className="text-left">
                           <h3 className="font-semibold">
@@ -528,7 +527,7 @@ export function CommissionList() {
                       >
                         <div className="flex items-center justify-between p-4 bg-muted/20">
                           <div className="flex items-center space-x-3">
-                            <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                            <CalendarDays className="w-4 h-4 text-muted-foreground" />
                             <div>
                               <div className="font-medium">
                                 {format(
@@ -565,7 +564,7 @@ export function CommissionList() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
+                                className="text-green-700 border-green-200 bg-green-50 hover:bg-green-100"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setSelectedBulkPayment({
@@ -578,7 +577,7 @@ export function CommissionList() {
                                 }}
                                 disabled={bulkPayCommissionsMutation.isPending}
                               >
-                                <CreditCard className="h-3 w-3 mr-1" />
+                                <CreditCard className="w-3 h-3 mr-1" />
                                 Pay All (
                                 {formatCurrency(dateGroup.unpaidAmount)})
                               </Button>
@@ -591,7 +590,7 @@ export function CommissionList() {
                           {dateGroup.commissions.map((commission) => (
                             <div
                               key={commission.id}
-                              className="p-4 pl-12 hover:bg-muted/30 transition-colors"
+                              className="p-4 pl-12 transition-colors hover:bg-muted/30"
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-3">
@@ -599,7 +598,7 @@ export function CommissionList() {
                                     {commission.sale && (
                                       <Link
                                         href={`/dashboard/sales/${commission.sale.id}`}
-                                        className="text-primary hover:underline font-medium"
+                                        className="font-medium text-primary hover:underline"
                                       >
                                         {commission.sale.invoice_number}
                                       </Link>
@@ -633,7 +632,7 @@ export function CommissionList() {
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button variant="ghost" size="sm">
-                                        <MoreHorizontal className="h-4 w-4" />
+                                        <MoreHorizontal className="w-4 h-4" />
                                         <span className="sr-only">Actions</span>
                                       </Button>
                                     </DropdownMenuTrigger>
@@ -656,7 +655,7 @@ export function CommissionList() {
                                             setIsPayoutDialogOpen(true);
                                           }}
                                         >
-                                          <Check className="mr-2 h-4 w-4" />
+                                          <Check className="w-4 h-4 mr-2" />
                                           Mark as Paid
                                         </DropdownMenuItem>
                                       )}

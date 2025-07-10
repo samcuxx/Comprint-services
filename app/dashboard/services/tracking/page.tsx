@@ -37,15 +37,12 @@ import {
   AreaChart,
 } from "recharts";
 import {
-  Users,
+
   Clock,
-  TrendingUp,
+
   AlertTriangle,
-  CheckCircle,
-  DollarSign,
-  Calendar,
-  Target,
-  Activity,
+
+
   Wrench,
   Timer,
   Award,
@@ -243,11 +240,11 @@ export default function ServiceTrackingPage() {
       {/* Key Metrics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">
               Total Requests
             </CardTitle>
-            <Wrench className="h-4 w-4 text-muted-foreground" />
+            <Wrench className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{metrics.total}</div>
@@ -262,11 +259,11 @@ export default function ServiceTrackingPage() {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">
               Completion Rate
             </CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
+            <Target className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -277,9 +274,9 @@ export default function ServiceTrackingPage() {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium"> ₵ </span>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -292,9 +289,9 @@ export default function ServiceTrackingPage() {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">Overdue</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-red-500" />
+            <AlertTriangle className="w-4 h-4 text-red-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">
@@ -419,11 +416,11 @@ export default function ServiceTrackingPage() {
           {/* Performance Metrics */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-sm font-medium">
                   Avg. Response Time
                 </CardTitle>
-                <Timer className="h-4 w-4 text-muted-foreground" />
+                <Timer className="w-4 h-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">2.4h</div>
@@ -434,11 +431,11 @@ export default function ServiceTrackingPage() {
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-sm font-medium">
                   Avg. Resolution Time
                 </CardTitle>
-                <Clock className="h-4 w-4 text-muted-foreground" />
+                <Clock className="w-4 h-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">18.5h</div>
@@ -449,11 +446,11 @@ export default function ServiceTrackingPage() {
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-sm font-medium">
                   Customer Satisfaction
                 </CardTitle>
-                <Award className="h-4 w-4 text-muted-foreground" />
+                <Award className="w-4 h-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">4.8/5</div>
@@ -462,11 +459,11 @@ export default function ServiceTrackingPage() {
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-sm font-medium">
                   First-Time Fix Rate
                 </CardTitle>
-                <Zap className="h-4 w-4 text-muted-foreground" />
+                <Zap className="w-4 h-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">87%</div>

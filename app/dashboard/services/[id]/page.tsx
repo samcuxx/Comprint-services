@@ -120,7 +120,7 @@ const getPaymentMethodBadge = (method: string) => {
     case "cash":
       return (
         <Badge variant="outline" className="text-green-600 border-green-600">
-          {/* <DollarSign className="w-3 h-3 mr-1" /> */}₵ Cash
+    ₵ Cash
         </Badge>
       );
     case "card":

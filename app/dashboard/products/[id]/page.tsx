@@ -15,7 +15,6 @@ import {
   Calendar,
   Info,
   ShoppingCart,
-  DollarSign,
   Percent,
 } from "lucide-react";
 import Link from "next/link";
@@ -143,7 +142,6 @@ export default function ProductDetailPage() {
                 Cost Price
               </p>
               <div className="flex items-center">
-                {/* <DollarSign className="w-4 h-4 mr-2 text-muted-foreground" /> */}
                 ₵
                 <p>{formatCurrency(product.cost_price)}</p>
               </div>
@@ -153,7 +151,6 @@ export default function ProductDetailPage() {
                 Selling Price
               </p>
               <div className="flex items-center">
-                {/* <DollarSign className="w-4 h-4 mr-2 text-muted-foreground" /> */}
                 <p>{formatCurrency(product.selling_price)}</p>
               </div>
             </div>
