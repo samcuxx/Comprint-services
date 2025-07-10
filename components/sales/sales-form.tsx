@@ -401,7 +401,7 @@ export function SalesForm() {
             <div className="space-y-4">
               <h2 className="text-lg font-semibold">Customer (Optional)</h2>
 
-              <div className="relative mb-4">
+              {/* <div className="relative mb-4">
                 <Search className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
                 <Input
                   placeholder="Search customers by name, email or phone"
@@ -409,7 +409,7 @@ export function SalesForm() {
                   onChange={(e) => setCustomerSearchQuery(e.target.value)}
                   className="pl-10"
                 />
-              </div>
+              </div> */}
 
               <FormField
                 control={form.control}

@@ -142,8 +142,7 @@ export default function ProductDetailPage() {
                 Cost Price
               </p>
               <div className="flex items-center">
-                ₵
-                <p>{formatCurrency(product.cost_price)}</p>
+                ₵<p>{formatCurrency(product.cost_price)}</p>
               </div>
             </div>
             <div className="space-y-1">

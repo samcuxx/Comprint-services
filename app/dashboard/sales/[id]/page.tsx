@@ -1,21 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSale } from "@/hooks/use-sales";
 import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/loading";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { InvoicePrint } from "@/components/sales/invoice-print";
 import {
   ArrowLeft,
   User,
   Calendar,
-  Receipt,
   CreditCard,
-  FileText,
   Printer,
   ShoppingCart,
   Package,
-  Truck,
   CircleDollarSign,
   Percent,
 } from "lucide-react";
@@ -29,6 +28,9 @@ export default function SaleDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const saleId = params.id as string;
+
+  // State for print modal
+  const [showPrintModal, setShowPrintModal] = useState(false);
 
   // Get current user to check role
   const { data: currentUser } = useCurrentUser();
@@ -127,15 +129,14 @@ export default function SaleDetailsPage() {
           <h1 className="text-2xl font-bold">Sale Details</h1>
         </div>
         <div className="flex items-center gap-2">
-         {/* NOTE: This is not working */}
-          {/* <Button
+          <Button
             variant="outline"
             size="sm"
-            onClick={() => window.print()}
+            onClick={() => setShowPrintModal(true)}
             className="hidden md:flex"
           >
             <Printer className="w-4 h-4 mr-2" /> Print Invoice
-          </Button> */}
+          </Button>
         </div>
       </div>
 
@@ -407,6 +408,15 @@ export default function SaleDetailsPage() {
           )}
         </div>
       </div>
+
+      {/* Print Modal */}
+      {sale && (
+        <InvoicePrint
+          sale={sale}
+          isOpen={showPrintModal}
+          onClose={() => setShowPrintModal(false)}
+        />
+      )}
     </div>
   );
 }
