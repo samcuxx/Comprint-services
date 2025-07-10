@@ -430,17 +430,17 @@ export function InvoicePrint({ sale, isOpen, onClose }: InvoicePrintProps) {
         <div className="flex-1 p-4 overflow-auto bg-white">
           <div
             ref={printRef}
-            className="invoice-container bg-white text-black"
+            className="text-black bg-white invoice-container"
             style={{ backgroundColor: "white", color: "black" }}
           >
             {/* Header */}
             <div className="invoice-header">
               <div className="company-info">
                 <h1>Comprint Services</h1>
-                <p>123 Business Street</p>
-                <p>City, State 12345</p>
-                <p>Phone: (555) 123-4567</p>
-                <p>Email: info@comprintservices.com</p>
+                <p>Bompata</p>
+                <p>Kumasi - Ghana</p>
+                <p>Phone: +233 24-463-9827</p>
+                <p>Email: boadiemmanuel@gmail.com</p>
               </div>
               <div className="invoice-title">
                 <h2>INVOICE</h2>
