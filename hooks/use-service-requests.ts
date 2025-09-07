@@ -1,14 +1,24 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { ServiceRequest, ServiceCategory, Customer, User } from "@/lib/types";
+import { ServiceRequest, ServiceCategory, Database } from "@/lib/database.types";
+import { useCurrentUser } from "@/hooks/use-current-user";
+
+type Customer = Database["public"]["Tables"]["customers"]["Row"];
+type User = Database["public"]["Tables"]["users"]["Row"];
 
 /**
- * Hook to fetch all service requests with related data
+ * Hook to fetch all service requests with related data (role-based access)
  */
 export const useServiceRequests = (query: string = "") => {
+  const { data: currentUser } = useCurrentUser();
+  
   return useQuery<ServiceRequest[], Error>({
-    queryKey: ["service-requests", query],
+    queryKey: ["service-requests", query, currentUser?.id, currentUser?.role],
     queryFn: async () => {
+      if (!currentUser) {
+        throw new Error("User not authenticated");
+      }
+
       let supabaseQuery = supabase
         .from("service_requests")
         .select(
@@ -21,6 +31,13 @@ export const useServiceRequests = (query: string = "") => {
         `
         )
         .order("created_at", { ascending: false });
+
+      // Apply role-based filtering
+      if (currentUser.role === "technician") {
+        // Technicians can only see their assigned requests
+        supabaseQuery = supabaseQuery.eq("assigned_technician_id", currentUser.id);
+      }
+      // Admin and sales can see all requests (handled by RLS policies)
 
       if (query) {
         supabaseQuery = supabaseQuery.or(
@@ -36,6 +53,7 @@ export const useServiceRequests = (query: string = "") => {
 
       return data || [];
     },
+    enabled: !!currentUser,
   });
 };
 

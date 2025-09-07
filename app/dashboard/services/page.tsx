@@ -106,8 +106,10 @@ export default function ServicesPage() {
 
   const isAdmin = currentUser?.role === "admin";
   const isTechnician = currentUser?.role === "technician";
+  const isSales = currentUser?.role === "sales";
 
   // Filter service requests based on user role and filters
+  // Note: Role-based filtering is now handled in the useServiceRequests hook
   const filteredRequests =
     serviceRequests?.filter((request) => {
       const matchesSearch =
@@ -182,13 +184,15 @@ export default function ServicesPage() {
           </h1>
           <p className="text-muted-foreground">
             {isAdmin
-              ? "Manage all service requests and assignments"
+              ? "Manage all service requests and assignments across the organization"
               : isTechnician
-              ? "View and update your assigned service requests"
+              ? "View and update service requests assigned to you"
+              : isSales
+              ? "Create and track service requests for customers"
               : "Create and track service requests"}
           </p>
         </div>
-        {(isAdmin || currentUser?.role === "sales") && (
+        {(isAdmin || isSales) && (
           <Link href="/dashboard/services/new">
             <Button>
               <Plus className="mr-2 h-4 w-4" />
@@ -315,7 +319,21 @@ export default function ServicesPage() {
       {/* Service Requests Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Service Requests ({filteredRequests.length})</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>
+              Service Requests ({filteredRequests.length})
+              {isTechnician && (
+                <span className="ml-2 text-sm font-normal text-muted-foreground">
+                  (Assigned to you)
+                </span>
+              )}
+            </CardTitle>
+            {isTechnician && (
+              <div className="text-sm text-muted-foreground">
+                Only showing your assigned requests
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           {filteredRequests.length === 0 ? (
@@ -330,9 +348,11 @@ export default function ServicesPage() {
                 priorityFilter !== "all" ||
                 paymentStatusFilter !== "all"
                   ? "Try adjusting your filters to see more results."
+                  : isTechnician
+                  ? "No service requests have been assigned to you yet."
                   : "Get started by creating your first service request."}
               </p>
-              {(isAdmin || currentUser?.role === "sales") && (
+              {(isAdmin || isSales) && (
                 <Link href="/dashboard/services/new">
                   <Button>
                     <Plus className="mr-2 h-4 w-4" />
