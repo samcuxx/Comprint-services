@@ -46,7 +46,7 @@ const adminNavItems: NavItem[] = [
     gradient: "from-blue-500 to-purple-500",
   },
   {
-    title: "Employees",
+    title: "Users",
     href: "/dashboard/employees",
     icon: Users,
     description: "Manage employee accounts",
@@ -252,16 +252,16 @@ export function Sidebar() {
   const navItems = getNavItems(userRole);
 
   return (
-    <aside className="flex flex-col w-64 h-full border-r bg-gradient-to-b from-background to-muted/30 shadow-sm">
+    <aside className="flex flex-col w-64 h-full border-r shadow-sm bg-gradient-to-b from-background to-muted/30">
       {/* Header */}
       <div className="flex items-center h-16 px-6 border-b bg-gradient-to-r from-blue-50/50 via-indigo-50/50 to-purple-50/50 dark:from-blue-950/20 dark:via-indigo-950/20 dark:to-purple-950/20">
         <Link href="/dashboard" className="flex items-center gap-3 group">
           <div className="relative">
-            <Monitor className="w-6 h-6 text-primary group-hover:scale-110 transition-transform duration-300" />
+            <Monitor className="w-6 h-6 transition-transform duration-300 text-primary group-hover:scale-110" />
             <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
           </div>
           <div>
-            <h1 className="text-lg font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-lg font-bold text-transparent bg-gradient-to-r from-primary to-blue-600 bg-clip-text">
               Comprint Services
             </h1>
           
@@ -317,14 +317,14 @@ export function Sidebar() {
 
                     {/* Active indicator */}
                     {isActive && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-r-full"></div>
+                      <div className="absolute left-0 w-1 h-6 -translate-y-1/2 rounded-r-full top-1/2 bg-gradient-to-b from-blue-500 to-purple-500"></div>
                     )}
                   </Link>
                 </TooltipTrigger>
                 {item.description && (
                   <TooltipContent
                     side="right"
-                    className="bg-background/95 backdrop-blur-xl border shadow-xl"
+                    className="border shadow-xl bg-background/95 backdrop-blur-xl"
                   >
                     <p className="font-medium">{item.description}</p>
                   </TooltipContent>
@@ -343,7 +343,7 @@ export function Sidebar() {
             <div>&copy; {new Date().getFullYear()}</div>
           </div>
           <div className="flex items-center space-x-1">
-            <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-blue-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-green-400 to-blue-500 animate-pulse"></div>
             <span className="text-xs text-muted-foreground">Online</span>
           </div>
         </div>

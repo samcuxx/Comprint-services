@@ -82,7 +82,7 @@ export default function BranchesPage() {
   if (isError) {
     return (
       <div className="flex h-[70vh] flex-col items-center justify-center space-y-4">
-        <Building2 className="h-12 w-12 text-red-500" />
+        <Building2 className="w-12 h-12 text-red-500" />
         <h2 className="text-xl font-semibold">Failed to load branches</h2>
         <p className="text-muted-foreground">
           {error instanceof Error
@@ -102,7 +102,7 @@ export default function BranchesPage() {
       </div>
 
       <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
         <Input
           placeholder="Search branches by name or location..."
           value={searchQuery}
@@ -112,7 +112,7 @@ export default function BranchesPage() {
       </div>
 
       {filteredBranches.length === 0 ? (
-        <div className="flex h-40 items-center justify-center rounded-lg border bg-card">
+        <div className="flex items-center justify-center h-40 border rounded-lg bg-card">
           <p className="text-muted-foreground">
             {searchQuery.trim() !== ""
               ? "No branches match your search criteria"
@@ -124,13 +124,13 @@ export default function BranchesPage() {
           {filteredBranches.map((branch) => (
             <div
               key={branch.id}
-              className="rounded-lg border bg-card p-5 shadow-sm transition-all hover:shadow-md"
+              className="p-5 transition-all border rounded-lg shadow-sm bg-card hover:shadow-md"
             >
-              <div className="flex justify-between items-start mb-4">
+              <div className="flex items-start justify-between mb-4">
                 <div>
                   <h3 className="text-lg font-semibold">{branch.name}</h3>
                   <p className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <MapPin className="h-3 w-3" />
+                    <MapPin className="w-3 h-3" />
                     {branch.location}
                   </p>
                 </div>
@@ -144,7 +144,7 @@ export default function BranchesPage() {
                     }}
                     aria-label={`Edit ${branch.name}`}
                   >
-                    <Pencil className="h-4 w-4" />
+                    <Pencil className="w-4 h-4" />
                   </Button>
                   <Button
                     variant="outline"
@@ -155,12 +155,12 @@ export default function BranchesPage() {
                     }}
                     aria-label={`Delete ${branch.name}`}
                   >
-                    <Trash2 className="h-4 w-4 text-red-500" />
+                    <Trash2 className="w-4 h-4 text-red-500" />
                   </Button>
                 </div>
               </div>
 
-              <div className="space-y-3 rounded-md bg-muted/50 p-3">
+              <div className="p-3 space-y-3 rounded-md bg-muted/50">
                 <div className="flex justify-between text-sm">
                   <span className="font-medium">Commission Cutoff:</span>
                   <span>${branch.commission_cutoff.toFixed(2)}</span>
@@ -197,7 +197,7 @@ export default function BranchesPage() {
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the
               branch and all associated data. Note: You cannot delete a branch
-              that has associated employees.
+              that has associated Users.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

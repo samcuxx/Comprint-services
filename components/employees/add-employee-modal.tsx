@@ -73,7 +73,7 @@ export function AddEmployeeModal({ onEmployeeAdded }: AddEmployeeModalProps) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Failed to add employee",
+        description: error.message || "Failed to add User",
       });
     } finally {
       setIsLoading(false);
@@ -84,13 +84,13 @@ export function AddEmployeeModal({ onEmployeeAdded }: AddEmployeeModalProps) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Employee
+          <Plus className="w-4 h-4 mr-2" />
+          Add User
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Employee</DialogTitle>
+          <DialogTitle>Add New User</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-4">
@@ -181,7 +181,7 @@ export function AddEmployeeModal({ onEmployeeAdded }: AddEmployeeModalProps) {
             </div>
           </div>
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Adding..." : "Add Employee"}
+            {isLoading ? "Adding..." : "Add User"}
           </Button>
         </form>
       </DialogContent>

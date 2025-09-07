@@ -131,8 +131,8 @@ export default function EmployeesPage() {
   if (isError) {
     return (
       <div className="flex h-[70vh] flex-col items-center justify-center space-y-4">
-        <UserX className="h-12 w-12 text-red-500" />
-        <h2 className="text-xl font-semibold">Failed to load employees</h2>
+        <UserX className="w-12 h-12 text-red-500" />
+        <h2 className="text-xl font-semibold">Failed to load Users</h2>
         <p className="text-muted-foreground">
           {error instanceof Error
             ? error.message
@@ -146,12 +146,12 @@ export default function EmployeesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Employees</h1>
+        <h1 className="text-2xl font-bold">Users</h1>
         <AddEmployeeModal onEmployeeAdded={() => refetch()} />
       </div>
 
       <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
         <Input
           placeholder="Search employees by name, email, ID or role..."
           value={searchQuery}
@@ -160,17 +160,17 @@ export default function EmployeesPage() {
         />
       </div>
 
-      <div className="rounded-md border shadow">
+      <div className="border rounded-md shadow">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b bg-muted/50">
-                <th className="p-4 text-left font-medium">Name</th>
-                <th className="p-4 text-left font-medium">Email</th>
-                <th className="p-4 text-left font-medium">Staff ID</th>
-                <th className="p-4 text-left font-medium">Role</th>
-                <th className="p-4 text-left font-medium">Status</th>
-                <th className="p-4 text-left font-medium">Actions</th>
+                <th className="p-4 font-medium text-left">Name</th>
+                <th className="p-4 font-medium text-left">Email</th>
+                <th className="p-4 font-medium text-left">Staff ID</th>
+                <th className="p-4 font-medium text-left">Role</th>
+                <th className="p-4 font-medium text-left">Status</th>
+                <th className="p-4 font-medium text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -189,7 +189,7 @@ export default function EmployeesPage() {
                 filteredEmployees.map((employee) => (
                   <tr
                     key={employee.id}
-                    className="border-b hover:bg-muted/30 transition-colors"
+                    className="transition-colors border-b hover:bg-muted/30"
                   >
                     <td className="p-4 font-medium">{employee.full_name}</td>
                     <td className="p-4">{employee.email}</td>
@@ -217,7 +217,7 @@ export default function EmployeesPage() {
                           }}
                           aria-label={`Edit ${employee.full_name}`}
                         >
-                          <Pencil className="h-4 w-4" />
+                          <Pencil className="w-4 h-4" />
                         </Button>
                         <Button
                           variant="outline"
@@ -228,9 +228,9 @@ export default function EmployeesPage() {
                           } ${employee.full_name}`}
                         >
                           {employee.is_active ? (
-                            <PowerOff className="h-4 w-4 text-red-500" />
+                            <PowerOff className="w-4 h-4 text-red-500" />
                           ) : (
-                            <Power className="h-4 w-4 text-green-500" />
+                            <Power className="w-4 h-4 text-green-500" />
                           )}
                         </Button>
                         {/* <Button
@@ -242,7 +242,7 @@ export default function EmployeesPage() {
                           }}
                           aria-label={`Delete ${employee.full_name}`}
                         >
-                          <Trash2 className="h-4 w-4 text-red-500" />
+                          <Trash2 className="w-4 h-4 text-red-500" />
                         </Button> */}
                       </div>
                     </td>

@@ -136,7 +136,7 @@ function AdminDashboard({ stats }: { stats: any }) {
             <Button asChild className="flex-col h-auto gap-2 p-4">
               <Link href="/dashboard/employees">
                 <Users className="w-6 h-6" />
-                <span className="text-sm">Add Employee</span>
+                <span className="text-sm">Add User</span>
               </Link>
             </Button>
             <Button
