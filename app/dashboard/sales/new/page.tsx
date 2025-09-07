@@ -17,9 +17,9 @@ export default function NewSalePage() {
           onClick={() => router.back()}
           className="mr-2"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" /> Back
+          <ArrowLeft className="w-4 h-4 mr-2" /> Back
         </Button>
-        <h1 className="text-2xl font-bold">Create New Sale</h1>
+        <h1 className="text-2xl font-bold">Sales Form</h1>
       </div>
 
       <SalesForm />
