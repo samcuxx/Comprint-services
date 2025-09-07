@@ -154,13 +154,13 @@ const salesNavItems: NavItem[] = [
     gradient: "from-emerald-500 to-teal-500",
     badge: "Active",
   },
-  {
-    title: "Services",
-    href: "/dashboard/services",
-    icon: Wrench,
-    description: "Create service requests",
-    gradient: "from-indigo-500 to-purple-500",
-  },
+  // {
+  //   title: "Services",
+  //   href: "/dashboard/services",
+  //   icon: Wrench,
+  //   description: "Create service requests",
+  //   gradient: "from-indigo-500 to-purple-500",
+  // },
   // {
   //   title: "Service Tracking",
   //   href: "/dashboard/services/tracking",
