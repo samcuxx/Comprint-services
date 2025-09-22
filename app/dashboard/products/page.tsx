@@ -268,7 +268,7 @@ export default function ProductsInventoryPage() {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="outline" asChild>
-                    <Link href="/dashboard/inventory/new">
+                    <Link href="/dashboard/inventory/new?returnTo=/dashboard/products">
                       <Boxes className="w-4 h-4 mr-2" />
                       Add to Inventory
                     </Link>
@@ -614,8 +614,9 @@ export default function ProductsInventoryPage() {
             <AlertDialogHeader>
               <AlertDialogTitle>Delete Product</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to delete "{selectedProduct?.name}"? This
-                action cannot be undone and may affect existing sales data.
+                Are you sure you want to delete &ldquo;{selectedProduct?.name}
+                &rdquo;? This action cannot be undone and may affect existing
+                sales data.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

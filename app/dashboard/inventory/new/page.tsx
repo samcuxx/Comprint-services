@@ -3,10 +3,12 @@
 import { InventoryForm } from "@/components/inventory/inventory-form";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function NewInventoryPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo");
 
   return (
     <div className="space-y-6">
@@ -14,7 +16,7 @@ export default function NewInventoryPage() {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => router.back()}
+          onClick={() => router.push(returnTo || "/dashboard/products")}
           className="mr-2"
         >
           <ArrowLeft className="h-4 w-4 mr-2" /> Back

@@ -31,7 +31,7 @@ import {
   useInventoryByProductId,
 } from "@/hooks/use-inventory";
 import { Database } from "@/lib/database.types";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Package, PackageSearch } from "lucide-react";
 
 // Zod schema for inventory validation
@@ -58,6 +58,8 @@ export const InventoryForm = ({ inventoryId }: InventoryFormProps) => {
   const [isNewProduct, setIsNewProduct] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo");
   const isEditMode = !!inventoryId;
 
   // Fetch inventory data if in edit mode
@@ -159,8 +161,8 @@ export const InventoryForm = ({ inventoryId }: InventoryFormProps) => {
         });
       }
 
-      // Redirect to inventory page
-      router.push("/dashboard/inventory");
+      // Redirect to return URL or default to inventory page
+      router.push(returnTo || "/dashboard/inventory");
     } catch (error: unknown) {
       toast({
         variant: "destructive",
@@ -320,7 +322,7 @@ export const InventoryForm = ({ inventoryId }: InventoryFormProps) => {
           <Button
             type="button"
             variant="outline"
-            onClick={() => router.back()}
+            onClick={() => router.push(returnTo || "/dashboard/inventory")}
             disabled={isLoading}
           >
             Cancel
