@@ -139,13 +139,13 @@ const salesNavItems: NavItem[] = [
     description: "View product inventory",
     gradient: "from-purple-500 to-pink-500",
   },
-  {
-    title: "Inventory",
-    href: "/dashboard/inventory",
-    icon: PackageOpen,
-    description: "View stock levels",
-    gradient: "from-orange-500 to-red-500",
-  },
+  // {
+  //   title: "Inventory",
+  //   href: "/dashboard/inventory",
+  //   icon: PackageOpen,
+  //   description: "View stock levels",
+  //   gradient: "from-orange-500 to-red-500",
+  // },
   {
     title: "Sales",
     href: "/dashboard/sales",
