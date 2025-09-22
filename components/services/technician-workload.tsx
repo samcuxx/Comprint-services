@@ -28,7 +28,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatCurrency } from "@/lib/utils";
 import {
   User,
   Clock,
@@ -497,8 +497,18 @@ export function TechnicianWorkload({
 
                   {/* Active Requests */}
                   <div>
-                    <h4 className="font-medium mb-3">Active Requests</h4>
-                    <div className="space-y-2">
+                    <h4 className="font-medium mb-3 flex items-center gap-2">
+                      <Settings className="w-4 h-4" />
+                      Active Requests (
+                      {
+                        tech.requests.filter(
+                          (r) =>
+                            r.status !== "completed" && r.status !== "cancelled"
+                        ).length
+                      }
+                      )
+                    </h4>
+                    <div className="space-y-3">
                       {tech.requests
                         .filter(
                           (r) =>
@@ -507,34 +517,128 @@ export function TechnicianWorkload({
                         .map((request) => (
                           <div
                             key={request.id}
-                            className="flex items-center justify-between p-3 border rounded-lg"
+                            className="border rounded-lg p-4 space-y-3 hover:bg-muted/30 transition-colors"
                           >
-                            <div>
-                              <div className="font-medium">{request.title}</div>
-                              <div className="text-sm text-muted-foreground">
-                                {request.request_number} •{" "}
-                                {request.service_category?.name}
+                            {/* Request Title & Basic Info */}
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="font-semibold text-lg text-primary">
+                                  {request.title}
+                                </div>
+                                <div className="text-sm text-muted-foreground mt-1">
+                                  {request.request_number} •{" "}
+                                  {request.service_category?.name}
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <Badge
+                                  variant={
+                                    request.status === "in_progress"
+                                      ? "default"
+                                      : request.status === "pending"
+                                      ? "secondary"
+                                      : "outline"
+                                  }
+                                >
+                                  {request.status.replace("_", " ")}
+                                </Badge>
+                                <div className="mt-1">
+                                  <Badge
+                                    variant={
+                                      request.priority === "urgent"
+                                        ? "destructive"
+                                        : request.priority === "high"
+                                        ? "secondary"
+                                        : "outline"
+                                    }
+                                    className="text-xs"
+                                  >
+                                    {request.priority} priority
+                                  </Badge>
+                                </div>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <Badge
-                                variant={
-                                  request.status === "in_progress"
-                                    ? "default"
-                                    : "secondary"
-                                }
-                              >
-                                {request.status.replace("_", " ")}
-                              </Badge>
-                              {request.estimated_completion && (
-                                <div className="text-xs text-muted-foreground mt-1">
-                                  Due:{" "}
-                                  {formatDate(request.estimated_completion)}
+
+                            {/* Device Information */}
+                            {(request.device_type ||
+                              request.device_brand ||
+                              request.device_model) && (
+                              <div className="bg-muted/50 rounded-md p-3">
+                                <div className="text-sm font-medium text-foreground mb-1">
+                                  Device Information:
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                  {[
+                                    request.device_type,
+                                    request.device_brand,
+                                    request.device_model,
+                                  ]
+                                    .filter(Boolean)
+                                    .join(" • ")}
+                                  {request.device_serial_number && (
+                                    <div className="mt-1">
+                                      Serial: {request.device_serial_number}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Description */}
+                            {request.description && (
+                              <div>
+                                <div className="text-sm font-medium text-foreground mb-1">
+                                  Description:
+                                </div>
+                                <div className="text-sm text-muted-foreground line-clamp-2">
+                                  {request.description}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Timeline & Cost */}
+                            <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
+                              <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="w-3 h-3" />
+                                  Started: {formatDate(request.requested_date)}
+                                </div>
+                                {request.estimated_completion && (
+                                  <div className="flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    Due:{" "}
+                                    {formatDate(request.estimated_completion)}
+                                  </div>
+                                )}
+                              </div>
+                              {(request.estimated_cost ||
+                                request.final_cost) && (
+                                <div className="text-right">
+                                  {request.final_cost ? (
+                                    <span className="font-medium text-green-600">
+                                      Final:{" "}
+                                      {formatCurrency(request.final_cost)}
+                                    </span>
+                                  ) : request.estimated_cost ? (
+                                    <span>
+                                      Est:{" "}
+                                      {formatCurrency(request.estimated_cost)}
+                                    </span>
+                                  ) : null}
                                 </div>
                               )}
                             </div>
                           </div>
                         ))}
+                      {tech.requests.filter(
+                        (r) =>
+                          r.status !== "completed" && r.status !== "cancelled"
+                      ).length === 0 && (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <Settings className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                          <p>No active requests assigned</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
