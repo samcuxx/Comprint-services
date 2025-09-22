@@ -38,6 +38,7 @@ import {
   Eye,
   Settings,
 } from "lucide-react";
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 const statusConfig = {
   pending: {
@@ -467,9 +468,18 @@ export default function ServicesPage() {
                         </TableCell>
                         <TableCell>
                           <Link href={`/dashboard/services/${request.id}`}>
-                            <Button variant="ghost" size="sm">
-                              <Eye className="h-4 w-4" />
-                            </Button>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button variant="ghost" size="sm">
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top">
+                                  View Service Request
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           </Link>
                         </TableCell>
                       </TableRow>

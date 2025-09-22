@@ -33,7 +33,6 @@ import {
   useCreateSale,
   generateInvoiceNumber,
   useProductsWithInventory,
-  useSalesPersons,
 } from "@/hooks/use-sales";
 import { useCustomers } from "@/hooks/use-customers";
 import { useCurrentUser } from "@/hooks/use-current-user";
@@ -87,10 +86,6 @@ export function SalesForm() {
   const { data: customers = [], isLoading: isCustomersLoading } =
     useCustomers(customerSearchQuery);
 
-  // Fetch sales persons if user is admin
-  const { data: salesPersons = [], isLoading: isSalesPersonsLoading } =
-    useSalesPersons();
-
   // Filter products based on search query
   const filteredProducts = products.filter((product) => {
     if (!productSearchQuery) return true;
@@ -130,7 +125,7 @@ export function SalesForm() {
     resolver: zodResolver(saleSchema),
     defaultValues: {
       customer_id: undefined,
-      sales_person_id: isAdmin ? "" : currentUser?.id || "",
+      sales_person_id: currentUser?.id || "",
       payment_method: "cash",
       notes: "",
     },
@@ -516,45 +511,27 @@ export function SalesForm() {
             <div className="space-y-4">
               <h2 className="text-lg font-semibold">Payment Details</h2>
 
-              {isAdmin && (
-                <FormField
-                  control={form.control}
-                  name="sales_person_id"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Sales Person</FormLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a sales person" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {isSalesPersonsLoading ? (
-                            <div className="p-2 text-center text-muted-foreground">
-                              Loading sales persons...
-                            </div>
-                          ) : salesPersons.length === 0 ? (
-                            <div className="p-2 text-center text-muted-foreground">
-                              No sales persons found
-                            </div>
-                          ) : (
-                            salesPersons.map((person) => (
-                              <SelectItem key={person.id} value={person.id}>
-                                {person.full_name}
-                              </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
+              {/* Sales Person - Always show current logged-in user */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Sales Person
+                </label>
+                <div className="flex items-center space-x-2 p-3 border rounded-md bg-muted/50">
+                  <User className="w-4 h-4 text-muted-foreground" />
+                  <span className="font-medium">
+                    {currentUser?.full_name ||
+                      currentUser?.email ||
+                      "Unknown User"}
+                  </span>
+                  <Badge variant="secondary" className="ml-auto">
+                    {currentUser?.role?.charAt(0).toUpperCase() +
+                      currentUser?.role?.slice(1) || "User"}
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Sales will be attributed to your account
+                </p>
+              </div>
 
               <FormField
                 control={form.control}
