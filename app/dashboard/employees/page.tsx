@@ -7,7 +7,8 @@ import { Database } from "@/lib/database.types";
 import { AddEmployeeModal } from "@/components/employees/add-employee-modal";
 import { EditEmployeeModal } from "@/components/employees/edit-employee-modal";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Power, PowerOff, UserX, Search } from "lucide-react";
+import { Pencil,  Power, PowerOff, UserX, Search } from "lucide-react";
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -208,42 +209,63 @@ export default function EmployeesPage() {
                     </td>
                     <td className="p-4">
                       <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedEmployee(employee);
-                            setIsEditModalOpen(true);
-                          }}
-                          aria-label={`Edit ${employee.full_name}`}
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleToggleStatus(employee.id)}
-                          aria-label={`${
-                            employee.is_active ? "Deactivate" : "Activate"
-                          } ${employee.full_name}`}
-                        >
-                          {employee.is_active ? (
-                            <PowerOff className="w-4 h-4 text-red-500" />
-                          ) : (
-                            <Power className="w-4 h-4 text-green-500" />
-                          )}
-                        </Button>
-                        {/* <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedEmployee(employee);
-                            setIsDeleteDialogOpen(true);
-                          }}
-                          aria-label={`Delete ${employee.full_name}`}
-                        >
-                          <Trash2 className="w-4 h-4 text-red-500" />
-                        </Button> */}
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedEmployee(employee);
+                                  setIsEditModalOpen(true);
+                                }}
+                                aria-label={`Edit ${employee.full_name}`}
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Edit {employee.full_name}</TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleToggleStatus(employee.id)}
+                                aria-label={`${
+                                  employee.is_active ? "Deactivate" : "Activate"
+                                } ${employee.full_name}`}
+                              >
+                                {employee.is_active ? (
+                                  <PowerOff className="w-4 h-4 text-red-500" />
+                                ) : (
+                                  <Power className="w-4 h-4 text-green-500" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {employee.is_active ? "Deactivate" : "Activate"} {employee.full_name}
+                            </TooltipContent>
+                          </Tooltip>
+                          {/* 
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedEmployee(employee);
+                                  setIsDeleteDialogOpen(true);
+                                }}
+                                aria-label={`Delete ${employee.full_name}`}
+                              >
+                                <Trash2 className="w-4 h-4 text-red-500" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Delete {employee.full_name}</TooltipContent>
+                          </Tooltip>
+                          */}
+                        </TooltipProvider>
                       </div>
                     </td>
                   </tr>
