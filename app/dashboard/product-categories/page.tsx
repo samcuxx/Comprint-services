@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { useCategories, useDeleteCategory } from "@/hooks/use-categories";
 import { CategoryModal } from "@/components/products/category-modal";
 import { Database } from "@/lib/database.types";
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 type Category = Database["public"]["Tables"]["product_categories"]["Row"];
 
@@ -152,28 +153,44 @@ export default function ProductCategoriesPage() {
                     </td>
                     <td className="p-4">
                       <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedCategory(category);
-                            setIsEditModalOpen(true);
-                          }}
-                          aria-label={`Edit ${category.name}`}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedCategory(category);
-                            setIsDeleteDialogOpen(true);
-                          }}
-                          aria-label={`Delete ${category.name}`}
-                        >
-                          <Trash2 className="h-4 w-4 text-red-500" />
-                        </Button>
+                        <TooltipProvider delayDuration={300}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedCategory(category);
+                                  setIsEditModalOpen(true);
+                                }}
+                                aria-label={`Edit ${category.name}`}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top">
+                              Edit Category
+                            </TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedCategory(category);
+                                  setIsDeleteDialogOpen(true);
+                                }}
+                                aria-label={`Delete ${category.name}`}
+                              >
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top">
+                              Delete Category
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </div>
                     </td>
                   </tr>
