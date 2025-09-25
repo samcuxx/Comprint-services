@@ -490,7 +490,12 @@ export function ServiceRequestForm({
                               key={technician.id}
                               value={technician.id}
                             >
-                              {technician.full_name}
+                              <div className="flex items-center justify-between w-full">
+                                <span>{technician.full_name}</span>
+                                <span className="text-xs text-muted-foreground ml-2 capitalize">
+                                  ({technician.role})
+                                </span>
+                              </div>
                             </SelectItem>
                           ))}
                         </SelectContent>

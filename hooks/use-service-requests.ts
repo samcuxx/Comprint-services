@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { ServiceRequest, ServiceCategory, Database } from "@/lib/database.types";
+import {
+  ServiceRequest,
+  ServiceCategory,
+  Database,
+} from "@/lib/database.types";
 import { useCurrentUser } from "@/hooks/use-current-user";
 
 type Customer = Database["public"]["Tables"]["customers"]["Row"];
@@ -11,7 +15,7 @@ type User = Database["public"]["Tables"]["users"]["Row"];
  */
 export const useServiceRequests = (query: string = "") => {
   const { data: currentUser } = useCurrentUser();
-  
+
   return useQuery<ServiceRequest[], Error>({
     queryKey: ["service-requests", query, currentUser?.id, currentUser?.role],
     queryFn: async () => {
@@ -35,7 +39,10 @@ export const useServiceRequests = (query: string = "") => {
       // Apply role-based filtering
       if (currentUser.role === "technician") {
         // Technicians can only see their assigned requests
-        supabaseQuery = supabaseQuery.eq("assigned_technician_id", currentUser.id);
+        supabaseQuery = supabaseQuery.eq(
+          "assigned_technician_id",
+          currentUser.id
+        );
       }
       // Admin and sales can see all requests (handled by RLS policies)
 
@@ -328,7 +335,7 @@ export const useUpdateServiceRequestStatus = () => {
 };
 
 /**
- * Hook to fetch technicians (users with technician role)
+ * Hook to fetch technicians and admins (users who can be assigned to service requests)
  */
 export const useTechnicians = () => {
   return useQuery<User[], Error>({
@@ -337,7 +344,7 @@ export const useTechnicians = () => {
       const { data, error } = await supabase
         .from("users")
         .select("*")
-        .eq("role", "technician")
+        .in("role", ["technician", "admin"])
         .eq("is_active", true)
         .order("full_name");
 
